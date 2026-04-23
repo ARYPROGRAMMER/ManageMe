@@ -44,10 +44,116 @@ In all cases, the key is read from environment at runtime (safer), not hardcoded
 
 ---
 
-### Two valid auth paths
+##  ~/.openclaw/openclaw.json` (SAFE TEMPLATE)
 
-1. **API key path (simple):** set provider key env in shell/env and keep `apiKey: "${YOUR_ENV_VAR}"` in config.
-2. **Onboard/OAuth path:** run `openclaw onboard` and follow Gemini auth flow. In that case you can remove `providers.google.apiKey` from config if OpenClaw stores auth profile successfully.
+```json
+{
+  "agents": {
+    "defaults": {
+      "workspace": "/home/your-user/.openclaw/workspace",
+      "model": {
+        "primary": "google/gemini-3.1-flash-lite"
+      },
+      "skills": ["manageme"],
+      "models": {
+        "google/gemini-3.1-pro-preview": {},
+        "google/gemini-3-flash-preview": {}
+      }
+    }
+  },
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      "token": "REPLACE_WITH_RANDOM_TOKEN"
+    },
+    "port": 18789,
+    "bind": "loopback",
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "tools": {
+    "profile": "coding"
+  },
+  "auth": {
+    "profiles": {
+      "google:default": {
+        "provider": "google",
+        "mode": "api_key"
+      }
+    }
+  },
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "token": {
+        "source": "env",
+        "provider": "default",
+        "id": "DISCORD_BOT_TOKEN"
+      }
+    }
+  },
+  "skills": {
+    "entries": {
+      "manageme": {
+        "env": {
+          "MANAGEME_API_URL": "http://YOUR_HOST:3000",
+          "MANAGEME_WORKSPACE_ID": "YOUR_WORKSPACE_ID"
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## Environment variables (REQUIRED)
+
+```bash
+export MANAGEME_OPENCLAW_SECRET="YOUR_SECRET"
+export DISCORD_BOT_TOKEN="YOUR_DISCORD_TOKEN"
+```
+
+Make permanent:
+
+```bash
+echo 'export MANAGEME_OPENCLAW_SECRET="YOUR_SECRET"' >> ~/.bashrc
+echo 'export DISCORD_BOT_TOKEN="YOUR_DISCORD_TOKEN"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+---
+
+## Skill location
+
+```bash
+~/.openclaw/skills/manageme/SKILL.md
+```
+
+# ManageMe + OpenClaw
+
+## Setup
+1. Place skill:
+   ~/.openclaw/skills/manageme/SKILL.md
+
+2. Set env vars:
+   export MANAGEME_OPENCLAW_SECRET=...
+   export DISCORD_BOT_TOKEN=...
+
+3. Update config:
+   ~/.openclaw/openclaw.json
+
+4. Start:
+   openclaw gateway run
+
+## Notes
+- Ensure agent has: "skills": ["manageme"]
 
 ---
 
