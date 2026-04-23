@@ -1,0 +1,64 @@
+{
+  "gateway": {
+    "port": 18789,
+    "model": "REPLACE_WITH_PROVIDER_MODEL_REF"
+  },
+  "providers": {
+    "REPLACE_WITH_PROVIDER_ID": {
+      "apiKey": "${REPLACE_WITH_PROVIDER_API_KEY_ENV_VAR}"
+    }
+  },
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "botToken": "REPLACE_WITH_YOUR_DISCORD_BOT_TOKEN"
+    },
+    "telegram": {
+      "enabled": true,
+      "botToken": "REPLACE_WITH_YOUR_TELEGRAM_BOT_TOKEN"
+    },
+    "slack": {
+      "enabled": false,
+      "credential": "REPLACE_WITH_YOUR_SLACK_CREDENTIAL"
+    },
+    "whatsapp": {
+      "enabled": false,
+      "provider": "REPLACE_WITH_WHATSAPP_PROVIDER"
+    },
+    "signal": {
+      "enabled": false,
+      "session": "REPLACE_WITH_SIGNAL_SESSION"
+    }
+  },
+  "skills": [
+    {
+      "path": "./manageme.skill.md",
+      "name": "manageme",
+      "env": {
+        "MANAGEME_API_URL": "http://localhost:3000",
+        "MANAGEME_OPENCLAW_SECRET": "REPLACE_WITH_SECRET_FROM_MANAGEME_SETTINGS",
+        "MANAGEME_WORKSPACE_ID": "REPLACE_WITH_YOUR_WORKSPACE_ID"
+      }
+    }
+  ],
+  "tools": {
+    "webSearch": {
+      "enabled": true,
+      "provider": "brave"
+    }
+  },
+  "cron": [
+    {
+      "schedule": "0 8 * * *",
+      "message": "Run the morning briefing cron task from the manageme skill."
+    },
+    {
+      "schedule": "0 * * * *",
+      "message": "Run the due-soon reminder check from the manageme skill."
+    },
+    {
+      "schedule": "0 18 * * *",
+      "message": "Run the evening wrap-up cron task from the manageme skill."
+    }
+  ]
+}
