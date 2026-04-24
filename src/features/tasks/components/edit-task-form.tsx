@@ -22,10 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { createTaskSchema } from "../schemas";
-import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { TaskStatus } from "../types";
 import { MemberAvatar } from "@/features/members/components/member-avatar";
 import { DatePicker } from "@/components/date-picker";
@@ -45,8 +43,6 @@ export const EditTaskForm = ({
   memberOptions,
   initialValues,
 }: EditTaskFormProps) => {
-  const workspaceId = useWorkspaceId();
-  const router = useRouter();
   const { mutate, isPending } = useUpdateTask();
 
   const form = useForm<z.infer<typeof createTaskSchema>>({
@@ -73,14 +69,16 @@ export const EditTaskForm = ({
           form.reset();
           onCancel?.();
         },
-      }
+      },
     );
   };
 
   return (
     <Card className="glass-panel-strong h-full w-full rounded-3xl border-white/15">
       <CardHeader className="flex p-7">
-        <CardTitle className="text-xl font-bold text-white">Edit Task</CardTitle>
+        <CardTitle className="text-xl font-bold text-white">
+          Edit Task
+        </CardTitle>
       </CardHeader>
       <div className="px-7">
         <DottedSeparator />

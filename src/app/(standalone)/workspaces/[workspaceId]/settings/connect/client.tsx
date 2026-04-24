@@ -7,10 +7,24 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Bot, CheckCircle2, Download, PlugZap, ShieldCheck } from "lucide-react";
+import {
+  Bot,
+  CheckCircle2,
+  Copy,
+  Download,
+  ExternalLink,
+  PlugZap,
+  ShieldCheck,
+} from "lucide-react";
 
 type PlatformId = "telegram" | "slack" | "discord" | "whatsapp" | "signal";
 type OpenClawStatus = "unknown" | "connected" | "disconnected";
+type ConnectablePlatformId = "telegram" | "slack" | "discord";
+type OpenClawChannelConfig = {
+  enabled: boolean;
+  botToken?: string;
+  credential?: string;
+};
 
 const CONNECTABLE_PLATFORMS: PlatformId[] = ["telegram", "slack", "discord"];
 
@@ -28,7 +42,8 @@ const PLATFORMS: {
     id: "discord",
     name: "Discord",
     difficulty: "Easy",
-    difficultyClassName: "border-emerald-300/25 bg-emerald-300/10 text-emerald-100",
+    difficultyClassName:
+      "border-emerald-300/25 bg-emerald-300/10 text-emerald-100",
     description:
       "Connect your Discord channel credential for OpenClaw task automation.",
     steps: [
@@ -43,7 +58,8 @@ const PLATFORMS: {
     id: "telegram",
     name: "Telegram",
     difficulty: "Easy",
-    difficultyClassName: "border-emerald-300/25 bg-emerald-300/10 text-emerald-100",
+    difficultyClassName:
+      "border-emerald-300/25 bg-emerald-300/10 text-emerald-100",
     description:
       "Add your Telegram bot token for OpenClaw so messages create and update tasks.",
     steps: [
@@ -114,6 +130,47 @@ export const ConnectPlatformsClient = () => {
   const [providerAuthField, setProviderAuthField] = useState("apiKey");
   const [providerApiEnvVar, setProviderApiEnvVar] = useState("GEMINI_API_KEY");
 
+  const copySecret = async () => {
+    if (!openclawSecret) {
+      toast.error("No secret available yet.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(openclawSecret);
+      toast.success("OpenClaw secret copied.");
+    } catch {
+      toast.error("Could not copy secret to clipboard.");
+    }
+  };
+
+  const getCredentialInputType = (platform: PlatformId) => {
+    if (platform === "slack") {
+      return "text";
+    }
+
+    return "password";
+  };
+
+  const validateCredential = (
+    platform: ConnectablePlatformId,
+    credential: string,
+  ) => {
+    if (!credential.trim()) {
+      return "Please enter the credential first.";
+    }
+
+    if (platform === "telegram" && !credential.includes(":")) {
+      return "Telegram token format looks invalid.";
+    }
+
+    if (platform === "discord" && credential.trim().length < 20) {
+      return "Discord bot token looks too short.";
+    }
+
+    return null;
+  };
+
   const loadIntegration = useCallback(async () => {
     try {
       const res = await fetch(
@@ -179,10 +236,12 @@ export const ConnectPlatformsClient = () => {
     return () => window.clearInterval(intervalId);
   }, [openclawSecret, checkOpenClawStatus]);
 
-  const connectPlatform = async (platform: PlatformId) => {
+  const connectPlatform = async (platform: ConnectablePlatformId) => {
     const credential = credentials[platform]?.trim();
-    if (!credential) {
-      toast.error("Please enter the credential first.");
+    const validationError = validateCredential(platform, credential ?? "");
+
+    if (validationError) {
+      toast.error(validationError);
       return;
     }
 
@@ -224,7 +283,9 @@ export const ConnectPlatformsClient = () => {
       return;
     }
 
-    const channels: Record<string, any> = {};
+    const channels: Partial<
+      Record<ConnectablePlatformId, OpenClawChannelConfig>
+    > = {};
 
     if (credentials.telegram) {
       channels.telegram = {
@@ -311,6 +372,11 @@ export const ConnectPlatformsClient = () => {
           Configure OpenClaw integrations for Discord, Telegram, Slack, and
           more.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Badge variant="secondary">OpenClaw-first workflow</Badge>
+          <Badge variant="secondary">Secure workspace secret</Badge>
+          <Badge variant="secondary">Production-ready API routes</Badge>
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -334,6 +400,17 @@ export const ConnectPlatformsClient = () => {
                 <p className="text-sm text-muted-foreground">
                   {platform.description}
                 </p>
+                {platform.id === "discord" && (
+                  <a
+                    href="https://discord.com/developers/applications"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-flex items-center gap-1 text-xs text-neutral-300 transition hover:text-white"
+                  >
+                    Open Discord developer portal
+                    <ExternalLink className="size-3" />
+                  </a>
+                )}
               </CardHeader>
               <CardContent>
                 <ol className="mb-4 space-y-2 text-sm text-muted-foreground">
@@ -352,6 +429,7 @@ export const ConnectPlatformsClient = () => {
                 </p>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <Input
+                    type={getCredentialInputType(platform.id)}
                     placeholder={platform.credPlaceholder}
                     value={credentials[platform.id] ?? ""}
                     onChange={(event) =>
@@ -418,6 +496,23 @@ export const ConnectPlatformsClient = () => {
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
+          <div className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-neutral-500">
+                Workspace Secret
+              </p>
+              <p className="mt-1 font-mono text-sm text-neutral-200">
+                {openclawSecret
+                  ? `${openclawSecret.slice(0, 8)}...${openclawSecret.slice(-6)}`
+                  : "Generated after first platform connection"}
+              </p>
+            </div>
+            <Button onClick={() => void copySecret()} variant="muted" size="sm">
+              <Copy className="size-4" />
+              Copy secret
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <Input
               value={providerId}
