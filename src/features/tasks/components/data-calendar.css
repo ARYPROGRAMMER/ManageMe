@@ -1,6 +1,6 @@
 .rbc-header {
   @apply text-sm;
-  @apply font-normal;
+  @apply font-semibold;
   @apply pb-4;
   @apply text-muted-foreground;
   @apply border-b-0;
@@ -12,7 +12,7 @@
 
 .rbc-button-link {
   @apply text-xs;
-  @apply font-normal;
+  @apply font-semibold;
   @apply text-muted-foreground;
 }
 
@@ -20,15 +20,17 @@
   @apply min-h-[180px];
   @apply border-t;
   @apply border-x;
+  @apply border-white/10;
 }
 
 .rbc-month-row:last-of-type {
   @apply border-b;
-  @apply rounded-b-md;
+  @apply rounded-b-2xl;
+  @apply border-white/10;
 }
 
 :not(.rbc-month-row ~ .rbc-month-row).rbc-month-row {
-  @apply rounded-t-md;
+  @apply rounded-t-2xl;
 }
 
 .rbc-month-view {
@@ -40,5 +42,17 @@
 }
 
 .rbc-off-range-bg {
-  background: inherit;
+  background: rgba(255,255,255,0.02);
+}
+
+.rbc-today {
+  background: rgba(255,255,255,0.05);
+}
+
+.rbc-row-content {
+  @apply text-neutral-200;
+}
+
+.rbc-event {
+  @apply rounded-xl bg-transparent p-0;
 }

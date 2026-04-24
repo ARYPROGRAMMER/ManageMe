@@ -1,9 +1,10 @@
 "use client";
 
 import { DottedSeparator } from "@/components/dotted-separator";
+import { PremiumLoader } from "@/components/premium-loader";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useCreateTaskModal } from "../hooks/use-create-task-modal";
 import { useGetTasks } from "../api/use-get-tasks";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
@@ -57,10 +58,10 @@ export const TasksViewSwitcher = ({
     <Tabs
       defaultValue={view}
       onValueChange={setView}
-      className="flex-1 w-full border rounded-lg"
+      className="glass-panel min-h-[640px] w-full flex-1 rounded-3xl"
     >
-      <div className="h-full flex flex-col overflow-auto p-4">
-        <div className="flex flex-col gap-y-2 lg:flex-row justify-between items-center">
+      <div className="flex h-full flex-col overflow-auto p-4 sm:p-5">
+        <div className="flex flex-col items-center justify-between gap-y-3 lg:flex-row">
           <TabsList className="w-full lg:w-auto">
             <TabsTrigger className="h-8 w-full lg:w-auto" value="table">
               Table
@@ -81,8 +82,8 @@ export const TasksViewSwitcher = ({
         <DataFilters hideProjectFilter={hideProjectFilter} />
         <DottedSeparator className="my-4" />
         {isLoadingTasks ? (
-          <div className="w-full border rounded-lg h-[200px] flex flex-col items-center justify-center">
-            <Loader className="animate-spin size-5 text-muted-foreground" />
+          <div className="flex h-[360px] w-full flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/[0.03]">
+            <PremiumLoader label="Transforming task views" />
           </div>
         ) : (
           <>

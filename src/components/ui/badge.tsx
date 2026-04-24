@@ -4,27 +4,27 @@ import { cn } from "@/lib/utils";
 import { TaskStatus } from "@/features/tasks/types";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-background",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+          "border-white/20 bg-white text-black shadow hover:bg-neutral-200",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "border-white/10 bg-white/[0.08] text-neutral-100 hover:bg-white/[0.14]",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-foreground",
+          "border-red-400/30 bg-red-500/15 text-red-100 shadow hover:bg-red-500/25",
+        outline: "border-white/15 text-foreground",
         [TaskStatus.TODO]:
-          "border-transparent bg-red-400 text-primary hover:bg-red-400/80",
+          "border-neutral-500/30 bg-neutral-500/15 text-neutral-200 hover:bg-neutral-500/25",
         [TaskStatus.IN_PROGRESS]:
-          "border-transparent bg-yellow-400 text-primary hover:bg-yellow-400/80",
+          "border-amber-300/25 bg-amber-300/10 text-amber-100 hover:bg-amber-300/15",
         [TaskStatus.DONE]:
-          "border-transparent bg-emerald-400 text-primary hover:bg-emerald-400/80",
+          "border-emerald-300/25 bg-emerald-300/10 text-emerald-100 hover:bg-emerald-300/15",
         [TaskStatus.BACKLOG]:
-          "border-transparent bg-pink-400 text-primary hover:bg-pink-400/80",
+          "border-white/10 bg-white/[0.06] text-neutral-300 hover:bg-white/[0.1]",
         [TaskStatus.IN_REVIEW]:
-          "border-transparent bg-blue-400 text-primary hover:bg-blue-400/80",
+          "border-sky-300/25 bg-sky-300/10 text-sky-100 hover:bg-sky-300/15",
       },
     },
     defaultVariants: {

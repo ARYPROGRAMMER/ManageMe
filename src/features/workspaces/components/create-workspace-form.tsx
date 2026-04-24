@@ -67,9 +67,9 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
   };
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="glass-panel-strong h-full w-full rounded-3xl border-white/15">
       <CardHeader className="flex p-7">
-        <CardTitle className="text-xl font-bold">
+        <CardTitle className="text-xl font-bold text-white">
           Create a new Workspace
         </CardTitle>
       </CardHeader>
@@ -114,15 +114,17 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                           />
                         </div>
                       ) : (
-                        <Avatar className="size-[72px]">
-                          <AvatarFallback>
+                        <Avatar className="size-[72px] border border-white/10">
+                          <AvatarFallback className="bg-white/[0.06]">
                             <ImageIcon className="size-[36px] text-neutral-400" />
                           </AvatarFallback>
                         </Avatar>
                       )}
 
                       <div className="flex flex-col">
-                        <p className="text-sm">Workspace Icon</p>
+                        <p className="text-sm font-semibold text-white">
+                          Workspace Icon
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           JPG, PNG, SVG or JPEG, max 1mb
                         </p>

@@ -25,6 +25,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../schemas";
 import { useRegister } from "../api/use-register";
+import { signUpWithGithub, signUpWithGoogle } from "@/lib/oauth";
+import { LoaderCircle, Sparkles } from "lucide-react";
 
 export const SignUpCard = () => {
   const { mutate, isPending } = useRegister();
@@ -43,17 +45,26 @@ export const SignUpCard = () => {
   };
 
   return (
-    <Card className="w-full h-full md:w-[487px] border-none shadow-none">
-      <CardHeader className="flex items-center justify-center text-center p-7">
-        <CardTitle className="text-2xl">Create an Account</CardTitle>
-        <CardDescription>
+    <Card className="glass-panel-strong w-full max-w-[520px] overflow-hidden rounded-[2rem] border-white/15">
+      <CardHeader className="flex items-center justify-center p-8 text-center">
+        <div className="mb-4 flex size-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06]">
+          <Sparkles className="size-6 text-neutral-200" />
+        </div>
+        <CardTitle className="text-3xl font-bold text-white">
+          Create an account
+        </CardTitle>
+        <CardDescription className="mt-2 leading-6">
           By creating an account, you agree to our{" "}
           <Link href="/privacy">
-            <span className="text-blue-700">Privacy Policy</span>
+            <span className="text-white underline underline-offset-4">
+              Privacy Policy
+            </span>
           </Link>{" "}
           and{" "}
           <Link href="/terms">
-            <span className="text-blue-700">Terms of Service</span>
+            <span className="text-white underline underline-offset-4">
+              Terms of Service
+            </span>
           </Link>{" "}
         </CardDescription>
       </CardHeader>
@@ -118,6 +129,7 @@ export const SignUpCard = () => {
               )}
             />
             <Button disabled={isPending} size={"lg"} className="w-full">
+              {isPending && <LoaderCircle className="animate-spin" />}
               Register
             </Button>
           </form>
@@ -130,6 +142,7 @@ export const SignUpCard = () => {
 
       <CardContent className="p-7 flex flex-col gap-y-4">
         <Button
+          onClick={() => signUpWithGoogle()}
           disabled={isPending}
           variant={"secondary"}
           size={"lg"}
@@ -140,6 +153,7 @@ export const SignUpCard = () => {
         </Button>
 
         <Button
+          onClick={() => signUpWithGithub()}
           disabled={isPending}
           variant={"secondary"}
           size={"lg"}
@@ -155,10 +169,12 @@ export const SignUpCard = () => {
       </div>
 
       <CardContent className="p-7 flex items-center justify-center">
-        <p>
+        <p className="text-sm text-neutral-400">
           Already have an account?{" "}
           <Link href="/sign-in">
-            <span className="text-blue-500 underline">Sign In</span>
+            <span className="text-white underline underline-offset-4">
+              Sign In
+            </span>
           </Link>
         </p>
       </CardContent>

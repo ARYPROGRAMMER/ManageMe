@@ -1,12 +1,7 @@
-import { Loader } from "lucide-react";
-import React from "react";
+import { PremiumLoader } from "./premium-loader";
 
 function PageLoader() {
-  return (
-    <div className="flex items-center justify-center h-screen">
-      <Loader className="size-6 animate-spin text-muted-foreground" />
-    </div>
-  );
+  return <PremiumLoader fillScreen label="Shaping your workspace" />;
 }
 
 export default PageLoader;

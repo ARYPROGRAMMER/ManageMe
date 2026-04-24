@@ -54,10 +54,15 @@ export const TaskOverview = ({ task }: TaskOverviewProps) => {
   const appwriteProject = process.env.NEXT_PUBLIC_APPWRITE_PROJECT;
 
   return (
-    <div className="flex flex-col gap-y-4 col-span-1">
-      <div className="bg-muted rounded-lg p-4">
+    <div className="col-span-1 flex flex-col gap-y-4">
+      <div className="glass-panel rounded-3xl p-5">
         <div className="flex justify-between items-center">
-          <p className="text-lg font-semibold">Overview</p>
+          <div>
+            <p className="text-lg font-bold text-white">Overview</p>
+            <p className="text-xs text-muted-foreground">
+              Ownership, status, and attached context
+            </p>
+          </div>
           <Button
             onClick={() => open(task.$id)}
             size={"sm"}
@@ -70,7 +75,7 @@ export const TaskOverview = ({ task }: TaskOverviewProps) => {
 
         <DottedSeparator className="my-4" />
 
-        <div className="flex flex-col gap-y-4">
+        <div className="flex flex-col gap-y-3">
           <OverviewProperty label="Assignee">
             <MemberAvatar name={task.assignee.name} className="size-6" />
             <p className="text-sm font-medium">{task.assignee.name}</p>
@@ -114,7 +119,7 @@ export const TaskOverview = ({ task }: TaskOverviewProps) => {
                   return (
                     <div
                       key={`${resource.fileId ?? fileName}-${index}`}
-                      className="text-sm bg-white rounded-md border p-2"
+                      className="rounded-2xl border border-white/10 bg-white/[0.045] p-3 text-sm"
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-medium">{fileName}</span>
@@ -128,7 +133,7 @@ export const TaskOverview = ({ task }: TaskOverviewProps) => {
                             href={fileUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-xs text-blue-600 hover:underline"
+                            className="text-xs text-white underline underline-offset-4"
                           >
                             Open
                           </a>

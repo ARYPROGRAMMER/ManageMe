@@ -93,7 +93,7 @@ export const EditProjectForm = ({
   return (
     <div className="flex flex-col gap-y-4">
       <DeleteDialog />
-      <Card className="w-full h-full border-none shadow-none">
+      <Card className="glass-panel-strong h-full w-full rounded-3xl border-white/15">
         <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
           <Button
             size={"sm"}
@@ -110,7 +110,7 @@ export const EditProjectForm = ({
             <ArrowLeftIcon className="size-4 mr-2" />
             Back
           </Button>
-          <CardTitle className="text-xl font-bold">
+          <CardTitle className="text-xl font-bold text-white">
             {`${initialValues.name}`}
           </CardTitle>
         </CardHeader>
@@ -155,15 +155,17 @@ export const EditProjectForm = ({
                             />
                           </div>
                         ) : (
-                          <Avatar className="size-[72px]">
-                            <AvatarFallback>
+                          <Avatar className="size-[72px] border border-white/10">
+                            <AvatarFallback className="bg-white/[0.06]">
                               <ImageIcon className="size-[36px] text-neutral-400" />
                             </AvatarFallback>
                           </Avatar>
                         )}
 
                         <div className="flex flex-col">
-                          <p className="text-sm">Project Icon</p>
+                          <p className="text-sm font-semibold text-white">
+                            Project Icon
+                          </p>
                           <p className="text-sm text-muted-foreground">
                             JPG, PNG, SVG or JPEG, max 1mb
                           </p>
@@ -232,10 +234,10 @@ export const EditProjectForm = ({
         </CardContent>
       </Card>
 
-      <Card className="w-full h-full border-none shadow-none">
+      <Card className="glass-panel h-full w-full rounded-3xl border-red-400/20">
         <CardContent className="p-7">
           <div className="flex flex-col">
-            <h3 className="font-bold">Danger Zone</h3>
+            <h3 className="font-bold text-red-100">Danger Zone</h3>
 
             <p className="text-sm text-muted-foreground">
               Deleting a project is a permanent action and cannot be undone.

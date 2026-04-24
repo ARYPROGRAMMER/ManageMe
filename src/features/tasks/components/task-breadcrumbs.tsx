@@ -38,23 +38,27 @@ export const TaskBreadCrumbs = ({ project, task }: TaskBreadCrumbsProps) => {
   };
 
   return (
-    <div className="flex items-center gap-x-2">
+    <div className="glass-panel flex flex-col gap-4 rounded-3xl p-4 sm:flex-row sm:items-center">
       <ConfirmDialog />
-      <ProjectAvatar
-        name={project.name}
-        image={project.imageUrl}
-        className="size-6 lg:size-8"
-      />
+      <div className="flex min-w-0 items-center gap-x-2">
+        <ProjectAvatar
+          name={project.name}
+          image={project.imageUrl}
+          className="size-8 lg:size-10"
+        />
 
-      <Link href={`/workspaces/${workspaceId}/projects/${project.$id}`}>
-        <p className="text-sm lg:text-lg font-semibold text-muted-foreground hover:opacity-75 transition">
-          {project.name}
+        <Link href={`/workspaces/${workspaceId}/projects/${project.$id}`}>
+          <p className="truncate text-sm font-semibold text-muted-foreground transition hover:text-white lg:text-base">
+            {project.name}
+          </p>
+        </Link>
+        <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground lg:size-5" />
+        <p className="truncate text-sm font-bold text-white lg:text-lg">
+          {task.name}
         </p>
-      </Link>
-      <ChevronRightIcon className="size-4 lg:size-5 text-muted-foreground" />
-      <p className="text-sm lg:text-lg font-semibold">{task.name}</p>
+      </div>
       <Button
-        className="ml-auto"
+        className="sm:ml-auto"
         variant={"destructive"}
         size={"sm"}
         onClick={handleDeleteTask}

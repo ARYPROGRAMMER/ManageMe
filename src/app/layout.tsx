@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Comfortaa } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/components/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 
-const inter = Inter({
+const comfortaa = Comfortaa({
   subsets: ["latin"],
+  variable: "--font-comfortaa",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "ManageMe",
-  description: "A organisation and productivity app",
+  description: "A premium workspace and task operations product.",
 };
 
 export default function RootLayout({
@@ -20,8 +22,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={cn(inter.className, "antialiased min-h-screen")}>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body
+        className={cn(
+          comfortaa.variable,
+          comfortaa.className,
+          "min-h-screen overflow-x-hidden antialiased"
+        )}
+      >
         <Toaster />
         <QueryProvider>{children}</QueryProvider>
       </body>

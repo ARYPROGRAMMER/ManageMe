@@ -5,28 +5,31 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:text-neutral-300 border border-neutral-200 disabled:bg-neutral-100 disabled:from-neutral-100 disabled:to-neutral-100 shadow-sm [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-45 disabled:saturate-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         primary:
-          "bg-gradient-to-b from-blue-600 to-blue-700 text-primary-foreground hover:from-blue-700 hover:to-blue-700",
+          "border border-white/90 bg-white text-black shadow-[0_12px_35px_rgba(255,255,255,0.12)] hover:-translate-y-0.5 hover:bg-neutral-200 hover:shadow-[0_18px_45px_rgba(255,255,255,0.16)] active:translate-y-0",
         destructive:
-          "bg-gradient-to-b from-amber-600 to-amber-700 text-destructive-foreground hover:from-amber-700 hover:to-amber-700",
+          "border border-red-400/40 bg-red-500/15 text-red-100 shadow-sm hover:-translate-y-0.5 hover:bg-red-500/25 hover:text-white",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "border border-white/15 bg-white/[0.03] text-white shadow-sm hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/[0.08]",
         secondary:
-          "bg-white text-black hover:bg-neutral-100",
-        ghost: "border-transparent shadow-none hover:bg-accent hover:text-accent-foreground",
-        muted: "bg-neutral-200 text-neutral-600 hover:bg-neutral-200/80",
-        teritary: "bg-blue-100 text-blue-600 border-transparent hover:bg-blue-200 shadow-none"
+          "border border-white/10 bg-white/[0.08] text-white shadow-sm hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.13]",
+        ghost:
+          "border border-transparent bg-transparent text-neutral-300 shadow-none hover:bg-white/[0.08] hover:text-white",
+        muted:
+          "border border-white/10 bg-white/[0.06] text-neutral-300 hover:bg-white/[0.1] hover:text-white",
+        teritary:
+          "border border-white/10 bg-white/[0.1] text-white shadow-none hover:-translate-y-0.5 hover:bg-white/[0.16]",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-md px-3",
+        sm: "h-8 rounded-lg px-3",
         xs: "h-7 rounded-md px-2 text-xs",
-        lg: "h-12 rounded-md px-8",
-        icon: "h-8 w-8",
+        lg: "h-12 rounded-xl px-8",
+        icon: "h-9 w-9",
       },
     },
     defaultVariants: {

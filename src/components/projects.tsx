@@ -9,6 +9,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { RiAddCircleFill } from "react-icons/ri";
+import { Button } from "./ui/button";
 
 const Projects = () => {
   const workspaceId = useWorkspaceId();
@@ -19,11 +20,12 @@ const Projects = () => {
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase text-neutral-500">Projects</p>
-        <RiAddCircleFill
-          onClick={open}
-          className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition"
-        />
+        <p className="text-xs font-semibold uppercase text-neutral-500">
+          Projects
+        </p>
+        <Button type="button" variant="ghost" size="icon" onClick={open} className="size-7">
+          <RiAddCircleFill className="size-5" />
+        </Button>
       </div>
 
       {data?.rows.map((project) => {
@@ -33,9 +35,10 @@ const Projects = () => {
           <Link href={href} key={project.$id}>
             <div
               className={cn(
-                "flex items-center gap-2.5 p-2.5 rounded-md hover:opacity-75 transition cursor-pointer text-neutral-500",
+                "flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium text-neutral-500 transition-all hover:bg-white/[0.06] hover:text-white",
 
-                isActive && "bg-white shadow-sm hover:opacity-100 text-primary"
+                isActive &&
+                  "border border-white/10 bg-white text-black shadow-[0_14px_38px_rgba(255,255,255,0.1)] hover:bg-white hover:text-black"
               )}
             >
               <ProjectAvatar image={project.imageUrl} name={project.name} />

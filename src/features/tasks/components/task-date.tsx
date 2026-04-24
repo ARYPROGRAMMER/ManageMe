@@ -14,15 +14,15 @@ export function TaskDate({ value, className }: TaskDateProps) {
   let textColor = "text-muted-foreground";
 
   if (diffInDays < 3) {
-    textColor = "text-red-500";
+    textColor = "text-red-300";
   } else if (diffInDays < 7) {
-    textColor = "text-orange-500";
+    textColor = "text-amber-200";
   } else if (diffInDays < 14) {
-    textColor = "text-yellow-500";
+    textColor = "text-neutral-200";
   }
 
   return (
-    <div className={textColor}>
+    <div className={cn(textColor, "min-w-0")}>
       <span className={cn("truncate", className)}>
         {format(endDate, "PPP")}
       </span>

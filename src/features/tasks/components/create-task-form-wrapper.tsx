@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { PremiumLoader } from "@/components/premium-loader";
 import { useGetMembers } from "@/features/members/api/use-get-members";
 import { useGetProjects } from "@/features/projects/api/use-get-projects";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
-import { Loader } from "lucide-react";
 import { CreateTaskForm } from "./create-task-form";
 
 interface CreateTaskFormWrapperProps {
@@ -35,9 +35,9 @@ export const CreateTaskFormWrapper = ({
 
   if (isLoading) {
     return (
-      <Card className="w-full h-[714px] border-none shadow-none">
-        <CardContent className="flex items-center justify-center h-full">
-          <Loader className="size-5 text-muted-foreground animate-spin" />
+      <Card className="glass-panel-strong h-[714px] w-full rounded-3xl border-white/15">
+        <CardContent className="flex h-full items-center justify-center">
+          <PremiumLoader label="Preparing task form" />
         </CardContent>
       </Card>
     );

@@ -1,6 +1,5 @@
 import { UserButton } from "@/features/auth/components/user-button";
-import Image from "next/image";
-import Link from "next/link";
+import { BrandLogo } from "@/components/brand-logo";
 import React from "react";
 
 interface StandaloneLayoutProps {
@@ -9,17 +8,16 @@ interface StandaloneLayoutProps {
 
 const StandaloneLayout = ({ children }: StandaloneLayoutProps) => {
   return (
-    <main className="bg-neutral-100 min-h-screen">
-      <div className="mx-auto max-w-screen-2xl p-4">
-        <nav className="flex justify-between items-center h-[73px]">
-          <Link href="/">
-            <Image src="/logo.svg" alt="Logo" width={152} height={56} />
-          </Link>
-
+    <main className="relative min-h-screen overflow-hidden bg-background">
+      <div className="absolute inset-0 soft-grid opacity-40" />
+      <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-white/[0.08] blur-3xl" />
+      <div className="relative mx-auto max-w-screen-2xl p-4 sm:p-6">
+        <nav className="glass-panel flex h-[76px] items-center justify-between rounded-3xl px-4">
+          <BrandLogo />
           <UserButton />
         </nav>
 
-        <div className="flex flex-col items-center justify-center py-4">
+        <div className="flex flex-col items-center justify-center py-8">
           {children}
         </div>
       </div>

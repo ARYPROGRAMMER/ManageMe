@@ -27,7 +27,7 @@ export const TaskIdClient = () => {
 
       <DottedSeparator className="my-6" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <TaskOverview task={data} />
         <TaskDescription task={data} />
       </div>

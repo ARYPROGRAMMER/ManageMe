@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { Bot, CheckCircle2, Download, PlugZap, ShieldCheck } from "lucide-react";
 
 type PlatformId = "telegram" | "slack" | "discord" | "whatsapp" | "signal";
 type OpenClawStatus = "unknown" | "connected" | "disconnected";
@@ -27,7 +28,7 @@ const PLATFORMS: {
     id: "discord",
     name: "Discord",
     difficulty: "Easy",
-    difficultyClassName: "bg-green-100 text-green-800",
+    difficultyClassName: "border-emerald-300/25 bg-emerald-300/10 text-emerald-100",
     description:
       "Connect your Discord channel credential for OpenClaw task automation.",
     steps: [
@@ -42,7 +43,7 @@ const PLATFORMS: {
     id: "telegram",
     name: "Telegram",
     difficulty: "Easy",
-    difficultyClassName: "bg-green-100 text-green-800",
+    difficultyClassName: "border-emerald-300/25 bg-emerald-300/10 text-emerald-100",
     description:
       "Add your Telegram bot token for OpenClaw so messages create and update tasks.",
     steps: [
@@ -57,7 +58,7 @@ const PLATFORMS: {
     id: "slack",
     name: "Slack",
     difficulty: "Medium",
-    difficultyClassName: "bg-yellow-100 text-yellow-800",
+    difficultyClassName: "border-amber-300/25 bg-amber-300/10 text-amber-100",
     description:
       "Store your Slack credential for OpenClaw task automation from Slack messages.",
     steps: [
@@ -72,7 +73,7 @@ const PLATFORMS: {
     id: "whatsapp",
     name: "WhatsApp",
     difficulty: "Hard",
-    difficultyClassName: "bg-red-100 text-red-800",
+    difficultyClassName: "border-red-300/25 bg-red-300/10 text-red-100",
     description:
       "WhatsApp requires local channel/plugin setup in OpenClaw and is configured manually.",
     steps: [
@@ -86,7 +87,7 @@ const PLATFORMS: {
     id: "signal",
     name: "Signal",
     difficulty: "Hard",
-    difficultyClassName: "bg-red-100 text-red-800",
+    difficultyClassName: "border-red-300/25 bg-red-300/10 text-red-100",
     description:
       "Signal is configured through OpenClaw local channel plugin/session setup.",
     steps: [
@@ -300,26 +301,32 @@ export const ConnectPlatformsClient = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold">Connect Platforms</h1>
-        <p className="text-muted-foreground mt-1">
+    <div className="mx-auto w-full max-w-5xl px-4 py-8">
+      <div className="glass-panel mb-6 rounded-3xl p-6">
+        <div className="mb-5 flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06]">
+          <PlugZap className="size-6 text-neutral-200" />
+        </div>
+        <h1 className="text-3xl font-bold text-white">Connect Platforms</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground">
           Configure OpenClaw integrations for Discord, Telegram, Slack, and
           more.
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="grid gap-4 lg:grid-cols-2">
         {PLATFORMS.map((platform) => {
           const isConnectable = CONNECTABLE_PLATFORMS.includes(platform.id);
           const isConnected = connected[platform.id];
           const isLoading = loading[platform.id];
 
           return (
-            <Card key={platform.id}>
+            <Card key={platform.id} className="glass-panel rounded-3xl">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{platform.name}</CardTitle>
+                  <CardTitle className="flex items-center gap-2 text-base text-white">
+                    <Bot className="size-4 text-neutral-400" />
+                    {platform.name}
+                  </CardTitle>
                   <Badge className={platform.difficultyClassName}>
                     {platform.difficulty}
                   </Badge>
@@ -329,14 +336,21 @@ export const ConnectPlatformsClient = () => {
                 </p>
               </CardHeader>
               <CardContent>
-                <ol className="text-sm text-muted-foreground space-y-1 mb-4 list-decimal pl-5">
+                <ol className="mb-4 space-y-2 text-sm text-muted-foreground">
                   {platform.steps.map((step, index) => (
-                    <li key={index}>{step}</li>
+                    <li key={index} className="flex gap-2">
+                      <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-[10px] text-neutral-300">
+                        {index + 1}
+                      </span>
+                      <span>{step}</span>
+                    </li>
                   ))}
                 </ol>
 
-                <p className="text-xs font-medium mb-2">{platform.credLabel}</p>
-                <div className="flex gap-2">
+                <p className="mb-2 text-xs font-semibold uppercase text-neutral-500">
+                  {platform.credLabel}
+                </p>
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <Input
                     placeholder={platform.credPlaceholder}
                     value={credentials[platform.id] ?? ""}
@@ -370,26 +384,29 @@ export const ConnectPlatformsClient = () => {
         })}
       </div>
 
-      <Card className="mt-8 border-dashed">
+      <Card className="glass-panel-strong mt-6 rounded-3xl border-dashed border-white/15">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">OpenClaw Power Mode</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base text-white">
+              <ShieldCheck className="size-5 text-neutral-300" />
+              OpenClaw Power Mode
+            </CardTitle>
             <div className="flex items-center gap-2">
               {openclawStatus === "connected" && (
-                <span className="flex items-center gap-1 text-xs text-green-600">
-                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+                <span className="flex items-center gap-1 text-xs text-emerald-200">
+                  <span className="inline-block size-2 rounded-full bg-emerald-300" />
                   Connected
                 </span>
               )}
               {openclawStatus === "disconnected" && (
-                <span className="flex items-center gap-1 text-xs text-red-500">
-                  <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
+                <span className="flex items-center gap-1 text-xs text-red-200">
+                  <span className="inline-block size-2 rounded-full bg-red-300" />
                   Not reachable
                 </span>
               )}
               {openclawStatus === "unknown" && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <span className="w-2 h-2 rounded-full bg-neutral-400 inline-block" />
+                  <span className="inline-block size-2 rounded-full bg-neutral-500" />
                   Unknown
                 </span>
               )}
@@ -401,7 +418,7 @@ export const ConnectPlatformsClient = () => {
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <Input
               value={providerId}
               onChange={(event) => setProviderId(event.target.value)}
@@ -423,19 +440,20 @@ export const ConnectPlatformsClient = () => {
               placeholder="Env var name (example: GEMINI_API_KEY)"
             />
           </div>
-          <div className="bg-muted rounded-md p-3 font-mono text-sm space-y-1">
+          <div className="space-y-1 rounded-2xl border border-white/10 bg-white/[0.04] p-4 font-mono text-sm text-neutral-300">
             <p>1. Install OpenClaw on your machine</p>
             <p>2. Download config from below</p>
             <p>3. Save as ~/.openclaw/openclaw.json</p>
             <p>4. Put manageme.skill.md beside config</p>
             <p>5. Run: openclaw start</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <Button
               onClick={downloadOpenClawConfig}
               variant="outline"
               className="flex-1"
             >
+              <Download className="size-4" />
               Download openclaw.json
             </Button>
             <Button
@@ -443,6 +461,7 @@ export const ConnectPlatformsClient = () => {
               variant="ghost"
               size="sm"
             >
+              <CheckCircle2 className="size-4" />
               Check status
             </Button>
           </div>

@@ -11,6 +11,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-comfortaa)", "ui-sans-serif", "system-ui"],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -52,6 +55,12 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        surface: {
+          DEFAULT: "hsl(var(--surface))",
+          elevated: "hsl(var(--surface-elevated))",
+          muted: "hsl(var(--surface-muted))",
+        },
+        glow: "hsl(var(--glow))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -72,11 +81,44 @@ const config: Config = {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
+        "transformer-fold": {
+          "0%, 100%": {
+            transform: "rotate(0deg) scale(1)",
+            borderRadius: "18%",
+          },
+          "20%": {
+            transform: "rotate(90deg) scaleX(0.72) scaleY(1.18)",
+            borderRadius: "42%",
+          },
+          "40%": {
+            transform: "rotate(180deg) scale(0.78)",
+            borderRadius: "9999px",
+          },
+          "65%": {
+            transform: "rotate(270deg) scaleX(1.2) scaleY(0.72)",
+            borderRadius: "28%",
+          },
+          "82%": {
+            transform: "rotate(315deg) scale(1.08)",
+            borderRadius: "10%",
+          },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 1s ease-out",
         "fade-in-delay": "fade-in-delay 2s ease-out",
         "spin-slow": "spin-slow 3s linear infinite",
+        "transformer-fold": "transformer-fold 1.8s cubic-bezier(.65,0,.35,1) infinite",
+        shimmer: "shimmer 2.4s linear infinite",
+        float: "float 6s ease-in-out infinite",
       },
     },
   },

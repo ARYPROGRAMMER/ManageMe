@@ -1,62 +1,50 @@
 {
-  "agents": {
-    "defaults": {
-      "workspace": "/home/your-user/.openclaw/workspace",
-      "model": {
-        "primary": "google/gemini-3.1-flash-lite"
-      },
-      "skills": ["manageme"],
-      "models": {
-        "google/gemini-3.1-pro-preview": {},
-        "google/gemini-3-flash-preview": {}
-      }
-    }
-  },
   "gateway": {
-    "mode": "local",
-    "auth": {
-      "mode": "token",
-      "token": "REPLACE_WITH_RANDOM_TOKEN"
-    },
     "port": 18789,
-    "bind": "loopback",
-    "tailscale": {
-      "mode": "off",
-      "resetOnExit": false
-    }
+    "model": "google/gemini-3-flash-preview"
   },
-  "session": {
-    "dmScope": "per-channel-peer"
-  },
-  "tools": {
-    "profile": "coding"
-  },
-  "auth": {
-    "profiles": {
-      "google:default": {
-        "provider": "google",
-        "mode": "api_key"
-      }
+  "providers": {
+    "google": {
+      "apiKey": "${GEMINI_API_KEY}"
     }
   },
   "channels": {
     "discord": {
       "enabled": true,
-      "token": {
-        "source": "env",
-        "provider": "default",
-        "id": "DISCORD_BOT_TOKEN"
-      }
+      "botToken": "${DISCORD_BOT_TOKEN}"
+    },
+    "telegram": {
+      "enabled": false,
+      "botToken": "${TELEGRAM_BOT_TOKEN}"
+    },
+    "slack": {
+      "enabled": false,
+      "credential": "${SLACK_CREDENTIAL}"
     }
   },
-  "skills": {
-    "entries": {
-      "manageme": {
-        "env": {
-          "MANAGEME_API_URL": "http://YOUR_HOST:3000",
-          "MANAGEME_WORKSPACE_ID": "YOUR_WORKSPACE_ID"
-        }
+  "skills": [
+    {
+      "path": "./manageme.skill.md",
+      "name": "manageme",
+      "env": {
+        "MANAGEME_API_URL": "http://localhost:3000",
+        "MANAGEME_OPENCLAW_SECRET": "REPLACE_WITH_WORKSPACE_SECRET",
+        "MANAGEME_WORKSPACE_ID": "REPLACE_WITH_WORKSPACE_ID"
       }
     }
-  }
+  ],
+  "cron": [
+    {
+      "schedule": "0 8 * * *",
+      "message": "Use the manageme skill to send a morning briefing of open, high-priority, and due-today tasks."
+    },
+    {
+      "schedule": "0 * * * *",
+      "message": "Use the manageme skill to check for tasks due within 1 hour and send concise reminders."
+    },
+    {
+      "schedule": "0 18 * * *",
+      "message": "Use the manageme skill to summarize completed tasks and remaining work."
+    }
+  ]
 }

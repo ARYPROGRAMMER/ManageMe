@@ -55,7 +55,7 @@ export const MembersList = () => {
   };
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="glass-panel-strong h-full w-full rounded-3xl border-white/15">
       <ConfirmDialog />
       <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
         <Button asChild size={"sm"} variant={"secondary"}>
@@ -65,7 +65,7 @@ export const MembersList = () => {
           </Link>
         </Button>
 
-        <CardTitle className="text-xl font-bold">Members List</CardTitle>
+        <CardTitle className="text-xl font-bold text-white">Members List</CardTitle>
       </CardHeader>
 
       <div className="px-7">
@@ -75,7 +75,7 @@ export const MembersList = () => {
       <CardContent className="p-7">
         {data?.rows.map((member, index) => (
           <Fragment key={member.$id}>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] p-3">
               <MemberAvatar
                 className="size-10"
                 fallbackClassName="text-lg"
@@ -83,7 +83,7 @@ export const MembersList = () => {
               />
 
               <div className="flex flex-col">
-                <p className="text-sm font-medium">{member.name}</p>
+                <p className="text-sm font-semibold text-white">{member.name}</p>
 
                 <p className="text-xs text-muted-foreground">{member.email}</p>
               </div>
@@ -119,7 +119,7 @@ export const MembersList = () => {
                     Set as Member
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="font-medium text-amber-700"
+                    className="font-medium text-red-200"
                     onClick={() => handleDeleteMember(member.$id)}
                     disabled={isDeletingMember}
                   >

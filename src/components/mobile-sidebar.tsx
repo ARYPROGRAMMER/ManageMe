@@ -18,11 +18,11 @@ function MobileSidebar() {
   return (
     <Sheet modal={false} open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button  variant={"secondary"} className="lg:hidden">
-          <MenuIcon className="size-4 text-neutral-500" />
+        <Button variant={"secondary"} className="lg:hidden" size="icon">
+          <MenuIcon className="size-4 text-neutral-300" />
         </Button>
       </SheetTrigger>
-      <SheetContent side={"left"} className="p-0">
+      <SheetContent side={"left"} className="w-[320px] p-0">
         <Sidebar />
       </SheetContent>
     </Sheet>

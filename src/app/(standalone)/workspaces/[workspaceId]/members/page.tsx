@@ -11,7 +11,7 @@ const WorkspaceIdMembersPage = async () => {
   }
 
   return (
-    <div className="w-full lg:max-w-xl">
+    <div className="w-full lg:max-w-3xl">
       <MembersList />
     </div>
   );

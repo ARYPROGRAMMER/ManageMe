@@ -33,7 +33,7 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
 
   const onDelete = async () => {
     const ok = await confirm();
-    if (ok) return;
+    if (!ok) return;
 
     mutate({ param: { taskId: id } });
   };
@@ -78,7 +78,7 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
 
           <DropdownMenuItem
             onClick={onDelete}
-            className="text-amber-700 focus:text-amber-700 font-medium p-[10px]"
+            className="p-[10px] font-medium text-red-200 focus:text-red-100"
             disabled={isPending}
           >
             <TrashIcon className="size-4 mr-2 stroke-2" />

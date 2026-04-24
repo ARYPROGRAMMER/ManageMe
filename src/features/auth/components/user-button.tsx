@@ -18,7 +18,7 @@ export const UserButton = () => {
 
   if (isLoading) {
     return (
-      <div className="size-10 rounded-full flex items-center justify-center bg-neutral-200 border border-neutral-300">
+      <div className="flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06]">
         <Loader className="size-4 animate-spin text-muted-foreground" />
       </div>
     );
@@ -35,8 +35,8 @@ export const UserButton = () => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="outline-none relative">
-        <Avatar className="size-10 hover:opacity-75 transition border border-neutral-300">
-          <AvatarFallback className="bg-neutral-200 font-medium text-neutral-500 flex items-center justify-center ">
+        <Avatar className="size-10 border border-white/15 transition hover:-translate-y-0.5 hover:border-white/30">
+          <AvatarFallback className="flex items-center justify-center bg-white font-bold text-black">
             {avatarFallback}
           </AvatarFallback>
         </Avatar>
@@ -45,17 +45,17 @@ export const UserButton = () => {
       <DropdownMenuContent
         align="end"
         side="bottom"
-        className="w-60"
+        className="w-64"
         sideOffset={10}
       >
         <div className="flex flex-col items-center justify-center gap-2 px-2.5 py-4">
-          <Avatar className="size-[52px] border border-neutral-300">
-            <AvatarFallback className="bg-neutral-200 text-xl font-medium text-neutral-500 flex items-center justify-center ">
+          <Avatar className="size-[52px] border border-white/15">
+            <AvatarFallback className="flex items-center justify-center bg-white text-xl font-bold text-black">
               {avatarFallback}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-center justify-center">
-            <p className="text-sm font-medium text-neutral-900">
+            <p className="text-sm font-semibold text-white">
               {name || "User"}
             </p>
 
@@ -66,7 +66,7 @@ export const UserButton = () => {
         <DropdownMenuItem
           disabled={isPending}
           onClick={() => mutate()}
-          className="h-10 flex items-center justify-center text-amber-700 font-medium cursor-pointer"
+          className="flex h-10 cursor-pointer items-center justify-center font-medium text-red-200"
         >
           <LogOut className="size-4 mr-2" />
           Logout

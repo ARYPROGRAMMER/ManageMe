@@ -71,9 +71,11 @@ export const CreateTaskForm = ({
   };
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="glass-panel-strong h-full w-full rounded-3xl border-white/15">
       <CardHeader className="flex p-7">
-        <CardTitle className="text-xl font-bold">Create a new Task</CardTitle>
+        <CardTitle className="text-xl font-bold text-white">
+          Create a new Task
+        </CardTitle>
       </CardHeader>
       <div className="px-7">
         <DottedSeparator />

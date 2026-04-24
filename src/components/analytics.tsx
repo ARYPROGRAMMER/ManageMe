@@ -5,29 +5,29 @@ import { DottedSeparator } from "./dotted-separator";
 
 export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
   return (
-    <ScrollArea className="border rounded-lg w-full whitespace-nowrap shrink-0">
-      <div className="w-full flex flex-row">
-        <div className="flex items-center flex-1">
+    <ScrollArea className="glass-panel w-full shrink-0 whitespace-nowrap rounded-3xl">
+      <div className="flex w-full min-w-[980px] flex-row">
+        <div className="flex flex-1 items-center">
           <AnalyticsCard
             title="Total Tasks"
             value={data.taskCount}
             variant={data.taskDifference > 0 ? "up" : "down"}
             increaseValue={data.taskDifference}
-          />{" "}
+          />
           <DottedSeparator direction="vertical" />
         </div>
 
-        <div className="flex items-center flex-1">
+        <div className="flex flex-1 items-center">
           <AnalyticsCard
             title="Assigned Tasks"
             value={data.assignedTaskCount}
             variant={data.assignedTaskDifference > 0 ? "up" : "down"}
             increaseValue={data.assignedTaskDifference}
-          />{" "}
+          />
           <DottedSeparator direction="vertical" />
         </div>
 
-        <div className="flex items-center flex-1">
+        <div className="flex flex-1 items-center">
           <AnalyticsCard
             title="Completed Tasks"
             value={data.completedTasksCount}
@@ -37,7 +37,7 @@ export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
           <DottedSeparator direction="vertical" />
         </div>
 
-        <div className="flex items-center flex-1">
+        <div className="flex flex-1 items-center">
           <AnalyticsCard
             title="Overdue Tasks"
             value={data.overdueTasksCount}
@@ -47,7 +47,7 @@ export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
           <DottedSeparator direction="vertical" />
         </div>
 
-        <div className="flex items-center flex-1">
+        <div className="flex flex-1 items-center">
           <AnalyticsCard
             title="Incomplete Tasks"
             value={data.incompleteTaskCount}

@@ -11,7 +11,7 @@ const WorkspaceCreatePage = async () => {
   }
 
   return (
-    <div className="w-full lg:max-w-xl">
+    <div className="w-full lg:max-w-2xl">
       <CreateWorkspaceForm />
     </div>
   );

@@ -78,9 +78,9 @@ export const EditTaskForm = ({
   };
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="glass-panel-strong h-full w-full rounded-3xl border-white/15">
       <CardHeader className="flex p-7">
-        <CardTitle className="text-xl font-bold">Edit Task</CardTitle>
+        <CardTitle className="text-xl font-bold text-white">Edit Task</CardTitle>
       </CardHeader>
       <div className="px-7">
         <DottedSeparator />

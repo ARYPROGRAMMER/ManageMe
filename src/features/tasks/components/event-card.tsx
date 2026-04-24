@@ -15,11 +15,11 @@ interface EventCardProps {
 }
 
 const statusColorMap: Record<TaskStatus, string> = {
-  [TaskStatus.TODO]: "border-l-red-500",
-  [TaskStatus.IN_PROGRESS]: "border-l-yellow-500",
-  [TaskStatus.DONE]: "border-l-emerald-500",
-  [TaskStatus.BACKLOG]: "border-l-pink-500",
-  [TaskStatus.IN_REVIEW]: "border-l-blue-500",
+  [TaskStatus.TODO]: "border-l-neutral-400",
+  [TaskStatus.IN_PROGRESS]: "border-l-amber-200",
+  [TaskStatus.DONE]: "border-l-emerald-200",
+  [TaskStatus.BACKLOG]: "border-l-neutral-600",
+  [TaskStatus.IN_REVIEW]: "border-l-sky-200",
 };
 
 export const EventCard = ({
@@ -38,18 +38,18 @@ export const EventCard = ({
   };
 
   return (
-    <div className="px-2">
+    <div className="px-1">
       <div
         onClick={onClick}
         className={cn(
-          "p-1.5 text-xs text-primary bg-white border rounded-md border-l-4 flex flex-col gap-y-1.5 cursor-pointer hover:opacity-75 transition",
+          "flex cursor-pointer flex-col gap-y-1.5 rounded-xl border border-white/10 border-l-4 bg-black/50 p-2 text-xs text-neutral-200 transition hover:border-white/20 hover:bg-white/[0.06]",
           statusColorMap[status]
         )}
       >
-        <p>{title}</p>
+        <p className="line-clamp-1 font-semibold">{title}</p>
         <div className="flex items-center gap-x-1">
           <MemberAvatar name={assignee?.name} />
-          <div className="size-1 rounded-full bg-neutral-300" />
+          <div className="size-1 rounded-full bg-neutral-700" />
 
           <ProjectAvatar name={project?.name} image={project?.imageUrl} />
         </div>

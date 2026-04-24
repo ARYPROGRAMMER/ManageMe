@@ -31,18 +31,23 @@ export const ProjectIdClient = () => {
   }
 
   return (
-    <div className="flex flex-col gap-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-x-2">
+    <div className="flex flex-col gap-y-6">
+      <div className="glass-panel flex flex-col gap-4 rounded-3xl p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-x-3">
           <ProjectAvatar
             name={project.name}
             image={project.imageUrl}
-            className="size-8"
+            className="size-12"
           />
-          <p className="text-lg font-semibold">{project.name}</p>
+          <div>
+            <p className="text-xl font-bold text-white">{project.name}</p>
+            <p className="text-sm text-muted-foreground">
+              Project execution overview
+            </p>
+          </div>
         </div>
 
-        <div>
+        <div className="flex">
           <Button variant={"secondary"} size={"sm"} asChild>
             <Link
               href={`/workspaces/${project.workspaceId}/projects/${project.$id}/settings`}

@@ -1,12 +1,8 @@
 "use client";
-import { Loader } from "lucide-react";
+import { PremiumLoader } from "@/components/premium-loader";
 
 const LoadingPage = () => {
-  return (
-    <div className="h-screen flex flex-col items-center justify-center ">
-      <Loader className="size-6 animate-spin text-muted-foreground" />
-    </div>
-  );
+  return <PremiumLoader fillScreen label="Preparing ManageMe" />;
 };
 
 export default LoadingPage;

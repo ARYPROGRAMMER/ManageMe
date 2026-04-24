@@ -39,7 +39,7 @@ interface CustomToolbarProps {
 
 const CustomToolbar = ({ date, onNavigate }: CustomToolbarProps) => {
   return (
-    <div className="flex mb-4 gap-x-2 items-center w-full lg:w-auto justify-center lg:justify-start">
+    <div className="mb-4 flex w-full items-center justify-center gap-x-2 lg:w-auto lg:justify-start">
       <Button
         onClick={() => onNavigate("PREV")}
         variant={"secondary"}
@@ -48,9 +48,9 @@ const CustomToolbar = ({ date, onNavigate }: CustomToolbarProps) => {
         <ChevronLeftIcon className="size-4" />
       </Button>
 
-      <div className="flex items-center border border-input rounded-md py-2 px-3 h-8 justify-center w-full lg:w-auto">
+      <div className="flex h-9 w-full items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 lg:w-auto">
         <CalendarIcon className="mr-2 size-4" />
-        <p className="text-sm">{format(date, "MMMM yyyy")}</p>
+        <p className="text-sm text-neutral-200">{format(date, "MMMM yyyy")}</p>
       </div>
 
       <Button

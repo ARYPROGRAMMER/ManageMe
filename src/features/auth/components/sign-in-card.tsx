@@ -20,6 +20,7 @@ import Link from "next/link";
 import { loginSchema } from "../schemas";
 import { useLogin } from "../api/use-login";
 import { signUpWithGithub, signUpWithGoogle } from "@/lib/oauth";
+import { LoaderCircle, LockKeyhole } from "lucide-react";
 
 export const SignInCard = () => {
   const { mutate, isPending } = useLogin();
@@ -37,9 +38,17 @@ export const SignInCard = () => {
   };
 
   return (
-    <Card className="w-full h-full md:w-[487px] border-none shadow-none">
-      <CardHeader className="flex items-center justify-center text-center p-7">
-        <CardTitle className="text-2xl">Welcome Back</CardTitle>
+    <Card className="glass-panel-strong w-full max-w-[520px] overflow-hidden rounded-[2rem] border-white/15">
+      <CardHeader className="flex items-center justify-center p-8 text-center">
+        <div className="mb-4 flex size-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06]">
+          <LockKeyhole className="size-6 text-neutral-200" />
+        </div>
+        <CardTitle className="text-3xl font-bold text-white">
+          Welcome back
+        </CardTitle>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          Continue into your workspace command center.
+        </p>
       </CardHeader>
       <div className="px-7">
         <DottedSeparator />
@@ -85,7 +94,8 @@ export const SignInCard = () => {
             />
 
             <Button disabled={isPending} size={"lg"} className="w-full">
-              Login
+              {isPending && <LoaderCircle className="animate-spin" />}
+              Sign in
             </Button>
           </form>
         </Form>
@@ -123,10 +133,12 @@ export const SignInCard = () => {
       </div>
 
       <CardContent className="p-7 flex items-center justify-center">
-        <p>
+        <p className="text-sm text-neutral-400">
           Don&apos;t have an account?{" "}
           <Link href="/sign-up">
-            <span className="text-blue-500 underline">Sign Up</span>
+            <span className="text-white underline underline-offset-4">
+              Sign Up
+            </span>
           </Link>
         </p>
       </CardContent>

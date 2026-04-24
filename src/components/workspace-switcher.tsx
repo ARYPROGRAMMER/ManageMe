@@ -13,6 +13,7 @@ import { WorkspaceAvatar } from "@/features/workspaces/components/workspace-avat
 import { useRouter } from "next/navigation";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { useCreateWorkspaceModal } from "@/features/workspaces/hooks/use-create-workspace-modal";
+import { Button } from "./ui/button";
 
 export const WorkspaceSwitcher = () => {
   const workspaceId = useWorkspaceId();
@@ -26,21 +27,22 @@ export const WorkspaceSwitcher = () => {
   return (
     <div className="flex flex-col gap-y-2">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase text-neutral-500">Workspaces</p>
-        <RiAddCircleFill
-          onClick={open}
-          className="size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition"
-        />
+        <p className="text-xs font-semibold uppercase text-neutral-500">
+          Workspaces
+        </p>
+        <Button type="button" variant="ghost" size="icon" onClick={open} className="size-7">
+          <RiAddCircleFill className="size-5" />
+        </Button>
       </div>
 
       <Select onValueChange={onSelect} value={workspaceId}>
-        <SelectTrigger className="w-full bg-neutral-200 font-medium p-1">
+        <SelectTrigger className="h-14 w-full rounded-2xl bg-white/[0.06] font-medium">
           <SelectValue placeholder="No workspace selected" />
         </SelectTrigger>
         <SelectContent>
           {workspaces?.rows.map((workspace) => (
             <SelectItem key={workspace.$id} value={workspace.$id}>
-              <div className="flex justify-start items-center gap-3 font-medium">
+              <div className="flex items-center justify-start gap-3 font-medium">
                 <WorkspaceAvatar
                   image={workspace.imageUrl}
                   name={workspace.name}

@@ -1,71 +1,60 @@
 ---
 name: manageme
-description: ManageMe assistant skill for task, project, status, and attachment operations through OpenClaw API routes.
+description: ManageMe assistant skill for workspace tasks, projects, statuses, and attachments through the OpenClaw API.
 ---
 
 # ManageMe Skill
 
-You are the AI assistant for ManageMe.
-Execute actions through ManageMe OpenClaw APIs only.
+Use this skill when the user asks to create, list, complete, update, or attach resources to ManageMe tasks or projects from an OpenClaw channel.
 
-## Runtime configuration
+## Runtime Configuration
 
 Required environment variables:
 
-- `MANAGEME_API_URL` (example: `http://localhost:3000`)
+- `MANAGEME_API_URL` example: `http://localhost:3000`
 - `MANAGEME_OPENCLAW_SECRET`
 - `MANAGEME_WORKSPACE_ID`
 
-Request auth requirements:
+Every request must include:
 
 - Header: `x-openclaw-secret: {MANAGEME_OPENCLAW_SECRET}`
-- Workspace identifier: query `?w={MANAGEME_WORKSPACE_ID}` on every API call
+- Query: `?w={MANAGEME_WORKSPACE_ID}`
 
-## Non-negotiable rules
+## Rules
 
-- Use only `MANAGEME_API_URL + /api/oc/*` endpoints.
-- Never call web/session/UI routes (`/`, `/sign-in`, `/workspaces/*`, `/api/auth/*`, `/api/projects`, `/api/workspaces`, `/api/tasks`).
-- Keep responses short and practical.
-- Never leak raw stack traces, secrets, headers, or internal payload dumps.
-- For file messages, persist files first, then confirm.
+- Only call `MANAGEME_API_URL + /api/oc/*` endpoints.
+- Do not call browser routes, auth routes, workspace UI routes, or non-OpenClaw API routes.
+- Keep user replies concise and operational.
+- Never expose secrets, raw headers, stack traces, or internal payload dumps.
+- If a file is provided, upload it through `/api/oc/resource` before confirming.
 
-## Response style
+## Endpoints
 
-- Use concise operational confirmations.
-- Use emojis consistently: `✅` `📋` `📁` `⏰` `📎`.
-- If intent is ambiguous, make one reasonable assumption and state it briefly.
-
-## Endpoint map
-
-### 1. Health check
+### Health
 
 ```http
 GET {MANAGEME_API_URL}/api/oc/ping?w={MANAGEME_WORKSPACE_ID}
 x-openclaw-secret: {MANAGEME_OPENCLAW_SECRET}
 ```
 
-Use before first action in a new or failing session.
-
-### 2. List projects
+### List Projects
 
 ```http
 GET {MANAGEME_API_URL}/api/oc/projects?w={MANAGEME_WORKSPACE_ID}
 x-openclaw-secret: {MANAGEME_OPENCLAW_SECRET}
 ```
 
-### 3. Create project
+### Create Project
 
 ```http
 POST {MANAGEME_API_URL}/api/oc/project?w={MANAGEME_WORKSPACE_ID}
 x-openclaw-secret: {MANAGEME_OPENCLAW_SECRET}
 Content-Type: application/json
 
-{
-  "name": "string"
-}
+{ "name": "Project name" }
 ```
 
-### 4. Create task
+### Create Task
 
 ```http
 POST {MANAGEME_API_URL}/api/oc/task?w={MANAGEME_WORKSPACE_ID}
@@ -73,55 +62,49 @@ x-openclaw-secret: {MANAGEME_OPENCLAW_SECRET}
 Content-Type: application/json
 
 {
-  "title": "string (preferred)",
-  "name": "string (fallback alias for title)",
-  "description": "string (optional)",
-  "dueDate": "ISO-8601 string (optional)",
-  "priority": "low|medium|high (optional, default medium)",
-  "projectId": "string (optional)",
-  "assigneeId": "string (optional)",
-  "sourceChannel": "discord|telegram|slack|whatsapp|openclaw (optional)"
+  "title": "Task title",
+  "description": "Optional notes",
+  "dueDate": "ISO-8601 date string",
+  "priority": "low|medium|high",
+  "projectId": "optional project id",
+  "assigneeId": "optional member id",
+  "sourceChannel": "discord|telegram|slack|whatsapp|openclaw"
 }
 ```
 
-Notes:
+Use `name` as a fallback alias for `title` only when needed. If neither is present, ask for the task title.
 
-- If neither `title` nor `name` is present, request a title.
-- If `projectId` is omitted, backend may auto-place into fallback project.
-
-### 5. List tasks
+### List Tasks
 
 ```http
-GET {MANAGEME_API_URL}/api/oc/tasks?w={MANAGEME_WORKSPACE_ID}&status=todo
+GET {MANAGEME_API_URL}/api/oc/tasks?w={MANAGEME_WORKSPACE_ID}&status=all
 x-openclaw-secret: {MANAGEME_OPENCLAW_SECRET}
 ```
 
-Optional query params:
+Optional query parameters:
 
 - `status=todo|in_progress|done|all`
 - `projectId=<id>`
-- `dueWithin=<Nh>` (example: `1h`, `24h`)
+- `dueWithin=<Nh>` example: `24h`
 
-### 6. Complete task
+### Complete Task
 
 ```http
 PATCH {MANAGEME_API_URL}/api/oc/task/{taskId}/complete?w={MANAGEME_WORKSPACE_ID}
 x-openclaw-secret: {MANAGEME_OPENCLAW_SECRET}
 ```
 
-### 7. Update task status
+### Update Task Status
 
 ```http
 PATCH {MANAGEME_API_URL}/api/oc/task/{taskId}/status?w={MANAGEME_WORKSPACE_ID}
 x-openclaw-secret: {MANAGEME_OPENCLAW_SECRET}
 Content-Type: application/json
 
-{
-  "status": "todo|in_progress|done"
-}
+{ "status": "todo|in_progress|done" }
 ```
 
-### 8. Save resource / attachment
+### Upload Resource
 
 ```http
 POST {MANAGEME_API_URL}/api/oc/resource?w={MANAGEME_WORKSPACE_ID}
@@ -129,43 +112,26 @@ x-openclaw-secret: {MANAGEME_OPENCLAW_SECRET}
 Content-Type: application/json
 
 {
-  "fileName": "string",
-  "mimeType": "string",
-  "base64Data": "string",
-  "taskId": "string (optional)",
-  "transcription": "string (optional)"
+  "fileName": "document.pdf",
+  "mimeType": "application/pdf",
+  "base64Data": "base64 string or data URL",
+  "taskId": "optional task id",
+  "transcription": "optional extracted text"
 }
 ```
 
-Supports PDF, images (JPG/PNG/WebP), text files, and other binary documents that can be base64 encoded.
+## Task Resolution
 
-## File handling workflow
+When the user refers to a task by name:
 
-1. If one file is sent, save it immediately through `/api/oc/resource`.
-2. If multiple files are sent, save each file one-by-one and confirm each result.
-3. If user asks to attach to a task, resolve task first (or ask for task name if ambiguous), then pass `taskId`.
-4. If a transcript/caption exists (voice/audio/doc text), include it as `transcription` when useful.
+1. Fetch candidate tasks with `/api/oc/tasks`.
+2. Prefer exact title matches, then close fuzzy matches.
+3. If one match is clear, perform the action.
+4. If multiple matches are plausible, ask the user to choose.
 
-## Task-resolution behavior
-
-When user says “complete/update task <name>” without task ID:
-
-1. Fetch candidate tasks from `/api/oc/tasks` with relevant status.
-2. Fuzzy-match by title.
-3. If exactly one clear match, execute update.
-4. If multiple close matches, ask user to clarify.
-
-## Cron prompts (if cron is enabled in OpenClaw)
-
-- Morning briefing (`0 8 * * *`): summarize todo + high-priority + due-today.
-- Due-soon check (`0 * * * *`): call tasks with `dueWithin=1h`, send concise reminder.
-- Evening wrap-up (`0 18 * * *`): summarize completed vs remaining.
-
-## Error messaging policy
+## Error Messages
 
 - `401`: `Your ManageMe connection needs re-authorizing. Please check your settings.`
 - `404`: `That workspace or item was not found. Please check your ManageMe configuration.`
 - `413`: `That file is too large for upload.`
-- Other errors: `Something went wrong reaching ManageMe. Try again in a moment.`
-
-Never include internals in user-facing error text.
+- Other: `Something went wrong reaching ManageMe. Try again in a moment.`

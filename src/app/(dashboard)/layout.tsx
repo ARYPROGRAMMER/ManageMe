@@ -12,21 +12,23 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background text-foreground">
       <CreateWorkspaceModal />
       <CreateProjectModal />
       <CreateTaskModal />
       <EditTaskModal />
-      <div className="flex w-full h-full">
-        <div className="fixed left-0 top-0 hidden lg:block lg:w-[264px] h-full overflow-y-auto">
+      <div className="flex min-h-screen w-full">
+        <div className="fixed left-0 top-0 hidden h-full overflow-y-auto border-r border-white/10 bg-black/45 backdrop-blur-2xl lg:block lg:w-[292px]">
           <Sidebar />
         </div>
 
-        <div className="lg:pl-[264px] w-full">
-          <div className="mx-auto max-w-screen-2xl h-full">
+        <div className="w-full lg:pl-[292px]">
+          <div className="min-h-screen w-full">
             <Navbar />
 
-            <main className="h-full py-8 px-6 flex flex-col">{children}</main>
+            <main className="mx-auto flex h-full max-w-[1600px] flex-col px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+              {children}
+            </main>
           </div>
         </div>
       </div>
