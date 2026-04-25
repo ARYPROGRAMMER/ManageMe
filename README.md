@@ -2,168 +2,362 @@
 	<img src="./readme-logo.svg" alt="ManageMe Logo" />
 </p>
 
-<p align="center">
-	A modern workspace, project, and member management dashboard built with Next.js, Appwrite, and Tailwind CSS.
-</p>
+# ManageMe
 
-<p align="center">
-	<a href="#features">Features</a>
-	·
-	<a href="#tech-stack">Tech Stack</a>
-	·
-	<a href="#getting-started">Getting Started</a>
-	·
-	<a href="#environment-variables">Environment Variables</a>
-	·
-	<a href="#project-structure">Project Structure</a>
-	·
-	<a href="#license">License</a>
-</p>
+A workspace and task management dashboard with OpenClaw integration for external channels.
 
----
-
-## Overview
-
-ManageMe is a dashboard-style web application for organizing workspaces, projects, and members in a clean, responsive interface. It uses Appwrite as a backend for authentication, database, and storage, and leverages modern React tooling like TanStack Query and Zod for robust data-fetching and validation.
-
-The app is built with the Next.js App Router, server components, and a set of reusable UI primitives to keep the UX fast, accessible, and consistent.
-
-## Features
-
-- **Authentication flows**: Sign in / sign up pages and auth layout in `src/app/(auth)`.
-- **Dashboard experience**: Workspace-centric dashboard in `src/app/(dashboard)`.
-- **Standalone workspaces**: Standalone workspace routes in `src/app/(standalone)`.
-- **Workspace management**: Workspace switching and creation via `features/workspaces` and `components/workspace-switcher.tsx`.
-- **Project management**: Create, edit, delete, and list projects in `features/projects`.
-- **Member management**: Member listing, avatars, and role utilities in `features/members`.
-- **Typed server routes**: API routes under `src/app/api` using Hono and Zod validation.
-- **Reusable UI kit**: Collection of headless UI components under `src/components/ui` (buttons, dialogs, tables, etc.).
-- **Responsive layout**: Mobile sidebar, navbar, and responsive modal components for smaller screens.
-
-## Tech Stack
-
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS, custom components, `tailwindcss-animate`
-- **State & Data**: React Query (`@tanstack/react-query`), React Hook Form
-- **Backend**: Appwrite (database, authentication, storage)
-- **Validation**: Zod + `@hono/zod-validator`
-- **UI / Icons**: Radix UI primitives, `lucide-react`, `sonner` for toasts
-
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ (recommended)
+- Node.js 18+
 - npm, pnpm, yarn, or bun
-- An Appwrite project (self-hosted or Appwrite Cloud)
+- Appwrite instance (self-hosted or cloud)
 
-### Install dependencies
+### Install
 
 ```bash
 npm install
-# or
-pnpm install
-# or
-yarn install
-# or
-bun install
 ```
 
-### Configure environment variables
+### Environment Variables
 
-Create a `.env.local` file in the project root and add the Appwrite configuration (see [Environment Variables](#environment-variables)).
+Create `.env.local`:
 
-### Run the development server
+```bash
+# Appwrite
+NEXT_PUBLIC_APPWRITE_ENDPOINT=https://your-appwrite.cloud
+NEXT_PUBLIC_APPWRITE_PROJECT_ID=your-project-id
+
+NEXT_PUBLIC_APPWRITE_DATABASE_ID=your-database-id
+NEXT_PUBLIC_APPWRITE_WORKSPACES_ID=workspaces-collection-id
+NEXT_PUBLIC_APPWRITE_MEMBERS_ID=members-collection-id
+NEXT_PUBLIC_APPWRITE_PROJECTS_ID=projects-collection-id
+NEXT_PUBLIC_APPWRITE_TASKS_ID=tasks-collection-id
+NEXT_PUBLIC_APPWRITE_FILES_BUCKET_ID=files-bucket-id
+NEXT_PUBLIC_APPWRITE_IMAGES_BUCKET_ID=images-bucket-id
+```
+
+### Run
 
 ```bash
 npm run dev
-# or
-pnpm dev
-# or
-yarn dev
-# or
-bun dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000)
 
-### Build for production
+## OpenClaw Setup
+
+ManageMe includes built-in OpenClaw integration for connecting external channels (Discord, Telegram, Slack, etc.) to your workspace.
+
+### 1. Install OpenClaw
+
+Follow the [OpenClaw installation guide](https://github.com/OpenClaw/OpenClaw) to set up the gateway.
+
+### 2. Configure OpenClaw
+
+Add to your `~/.openclaw/openclaw.json`:
+
+```json
+{
+  "skills": {
+    "entries": {
+      "manageme": {
+        "env": {
+          "MANAGEME_API_URL": "http://localhost:3000",
+          "MANAGEME_OPENCLAW_SECRET": "your-secret-here",
+          "MANAGEME_WORKSPACE_ID": "your-workspace-id"
+        }
+      }
+    }
+  }
+}
+```
+
+### 3. Install the Skill
 
 ```bash
-npm run build
-npm start
+cp manageme.skill.json ~/.openclaw/skills/manageme/SKILL.md
 ```
 
-## Environment Variables
+Or manually create `~/.openclaw/skills/manageme/SKILL.md` with the contents of `manageme.skill.md`.
 
-The Appwrite resources are configured via environment variables, consumed in `src/config.ts`.
+### 4. Configure Channels
 
-Create a `.env.local` file with at least:
+Example Discord channel setup in `openclaw.json`:
+
+```json
+{
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "token": {
+        "source": "env",
+        "provider": "default",
+        "id": "DISCORD_BOT_TOKEN"
+      },
+      "skills": ["manageme"],
+      "dm": {
+        "enabled": true
+      }
+    }
+  }
+}
+```
+
+### 5. Set Environment Variables
 
 ```bash
-NEXT_PUBLIC_APPWRITE_ENDPOINT=your-appwrite-endpoint
-NEXT_PUBLIC_APPWRITE_PROJECT_ID=your-appwrite-project-id
-
-NEXT_PUBLIC_APPWRITE_DATABASE_ID=your-database-id
-NEXT_PUBLIC_APPWRITE_WORKSPACES_ID=your-workspaces-collection-id
-NEXT_PUBLIC_APPWRITE_MEMBERS_ID=your-members-collection-id
-NEXT_PUBLIC_APPWRITE_PROJECTS_ID=your-projects-collection-id
-
-NEXT_PUBLIC_APPWRITE_IMAGES_BUCKET_ID=your-images-bucket-id
-NEXT_PUBLIC_APPWRITE_FILES_BUCKET_ID=your-files-bucket-id
+export MANAGEME_API_URL="http://localhost:3000"
+export MANAGEME_OPENCLAW_SECRET="your-secret-here"
+export MANAGEME_WORKSPACE_ID="your-workspace-id"
+export DISCORD_BOT_TOKEN="your-discord-token"
 ```
 
-You may have additional secrets for auth or other Appwrite features depending on how the backend is configured.
+### 6. Start OpenClaw
+
+```bash
+openclaw start
+```
+
+## Usage
+
+### From Discord/Telegram/Slack
+
+Once connected, you can manage tasks from your channel:
+
+```
+/create task "Review PR" --due 2024-01-15 --priority high
+/list tasks
+/complete task 123
+/upload resource <file> --task 123
+```
+
+See `manageme.skill.md` for all available commands.
+
+## Features
+
+- **Task Management**: Create, update, complete tasks
+- **File Attachments**: Upload files to tasks (images, PDFs, documents)
+- **Workspaces**: Organize tasks by workspace
+- **Projects**: Group tasks into projects
+- **Members**: Assign tasks to team members
+- **OpenClaw Integration**: Manage tasks from external channels
+
+## API Endpoints
+
+### OpenClaw API (`/api/oc/*`)
+
+For external channel integrations:
+
+- `GET /api/oc/ping` - Health check
+- `GET /api/oc/tasks` - List tasks
+- `POST /api/oc/task` - Create task
+- `PATCH /api/oc/task/{id}/status` - Update status
+- `PATCH /api/oc/task/{id}/complete` - Complete task
+- `POST /api/oc/resource` - Upload file attachment
+
+### Web UI API (`/api/tasks/*`)
+
+For the web interface:
+
+- `GET /api/tasks` - List tasks (with filters)
+- `POST /api/tasks` - Create task
+- `PATCH /api/tasks/{id}` - Update task
+- `DELETE /api/tasks/{id}` - Delete task
+- `POST /api/tasks/{id}/resource` - Upload attachment
+- `DELETE /api/tasks/{id}/resource/{fileId}` - Delete attachment
+
+## File Upload
+
+### From Web UI
+
+1. Navigate to a task
+2. Click "Add File" or drag and drop
+3. File appears in attachments list
+
+### From OpenClaw
+
+```bash
+curl -X POST "http://localhost:3000/api/oc/resource?w=workspace-id" \
+  -H "x-openclaw-secret: your-secret" \
+  -F "file=@./document.pdf" \
+  -F "taskId=task-id"
+```
+
+## Architecture
+
+- **Frontend**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS + Radix UI
+- **State**: TanStack Query
+- **Forms**: React Hook Form + Zod
+- **Backend**: Appwrite (DB, Auth, Storage)
+- **API**: Hono (type-safe routes)
 
 ## Project Structure
 
-High-level overview of the main folders:
-
-- `src/app` – Next.js App Router entrypoint, layouts, and routes
-  - `(auth)` – authentication layouts and pages (`sign-in`, `sign-up`)
-  - `(dashboard)` – authenticated dashboard layout and workspace overview
-  - `(standalone)` – standalone workspace routes and creation flow
-  - `api` – API routes (`[[...route]]/route.ts`) for server-side logic
-- `src/features` – feature-based modules (auth, workspaces, projects, members)
-  - `auth` – auth schemas, queries, hooks, and components
-  - `workspaces` – workspace types, schemas, hooks, and server routes
-  - `projects` – project CRUD logic, queries, and forms
-  - `members` – member utilities, API hooks, and avatar components
-- `src/components` – shared layout and UI components
-  - `ui` – base UI primitives (button, dialog, table, tabs, etc.)
-  - `navbar`, `sidebar`, `mobile-sidebar`, `workspace-switcher`, etc.
-- `src/lib` – app-level utilities and integrations
-  - `appwrite.ts` – Appwrite client setup
-  - `rpc.ts` – RPC-style helpers
-  - `session-middleware.ts` – session handling utilities
-  - `utils.ts` – general-purpose helpers
-
-## Development Notes
-
-- This project uses the **App Router**; pages are server components by default.
-- Data fetching is typically handled through feature-level hooks in `features/*/api` combined with `@tanstack/react-query`.
-- Validation is handled via Zod schemas in `features/*/schemas.ts` and `features/*/schema.ts`.
-- UI components are designed to be reusable and composable; prefer using the primitives under `src/components/ui` before adding new ones.
+```
+src/
+├── app/                    # Next.js routes
+├── features/               # Feature modules
+│   ├── tasks/             # Task management
+│   ├── projects/          # Project management
+│   ├── workspaces/        # Workspace management
+│   └── openclaw/          # OpenClaw integration
+├── components/            # Reusable UI
+└── lib/                   # Utilities
+```
 
 ## Scripts
 
-Useful `package.json` scripts:
+```bash
+npm run dev    # Development server
+npm run build  # Production build
+npm run lint   # Lint code
+```
 
-- `dev` – start the Next.js development server
-- `build` – build the production bundle
-- `start` – start the production server
-- `lint` – run ESLint
+## Documentation
 
-## Contributing
+- [OpenClaw Skills Guide](https://github.com/OpenClaw/OpenClaw/blob/main/docs/skills.md)
+- [Appwrite Documentation](https://appwrite.io/docs)
+- [Hono Framework](https://hono.dev)
 
-Contributions, bug reports, and feature requests are welcome. Feel free to open an issue or submit a pull request.
+## Architecture Deep Dive
 
-Before submitting a PR:
+### OpenClaw Integration Pattern
 
-1. Run `npm run lint` and fix any linting errors.
-2. Ensure the app builds and key flows still work.
+ManageMe demonstrates a clean separation between the web interface and external channel integrations:
+
+```
+External Channel (Discord/Telegram/Slack)
+    ↓
+OpenClaw Gateway (Authentication, Rate Limiting, Routing)
+    ↓
+ManageMe Skill (Command Parsing, Intent Recognition)
+    ↓
+Hono API (Type-Safe Endpoints)
+    ↓
+Zod Validation (Runtime Type Checking)
+    ↓
+Appwrite (Persistence, Real-time Subscriptions)
+    ↓
+Web Frontend (React Query Cache)
+```
+
+### Command Processing Pipeline
+
+1. **Request Reception**: OpenClaw receives HTTP POST from channel adapter
+2. **Security Validation**: HMAC signature verification, rate limit check
+3. **Routing**: Skill router directs to ManageMe handler
+4. **Parsing**: Natural language → structured command (action, entity, parameters)
+5. **Validation**: Zod schemas ensure data integrity
+6. **Execution**: Business logic creates/updates resources
+7. **Response**: Formatted for specific channel (Discord embeds, Telegram markdown)
+8. **Propagation**: React Query invalidation triggers real-time updates
+
+### File Upload Architecture
+
+```typescript
+// Multi-format support
+interface UploadHandler {
+  // multipart/form-data (large files)
+  handleMultipart(file: File, metadata: Metadata): Promise<UploadResult>;
+
+  // application/json (base64 encoded)
+  handleBase64(data: string, mimeType: string): Promise<UploadResult>;
+
+  // application/octet-stream (raw binary)
+  handleBinary(buffer: ArrayBuffer, filename: string): Promise<UploadResult>;
+
+  // text/plain (simple text)
+  handleText(content: string): Promise<UploadResult>;
+}
+```
+
+**Key Insight**: The FormData bug (passing FormData directly to Hono) revealed that browser and Node.js environments handle FormData iteration differently. Solution: pass plain objects, let Hono create FormData internally.
+
+### Real-time Synchronization
+
+```typescript
+// Appwrite real-time subscriptions
+const unsubscribe = databases.subscribe(
+  "tasks",
+  ["databases.*.collections.*.documents.*"],
+  (response) => {
+    // Invalidate React Query cache
+    queryClient.invalidateQueries({ queryKey: ["tasks"] });
+
+    // Optimistic UI updates
+    queryClient.setQueryData(["tasks"], (old) =>
+      updateTaskInList(old, response.payload),
+    );
+  },
+);
+```
+
+## Future Roadmap
+
+### 1. Webhook System
+
+Enable external services to react to task lifecycle events:
+
+```typescript
+app.post("/webhooks", async (c) => {
+  const { event, target, conditions } = await c.req.json();
+
+  await webhookService.register({
+    event: "task.created",
+    target: "https://api.slack.com/webhooks/...",
+    conditions: { priority: "high" },
+  });
+
+  return c.json({ id: webhookId, status: "active" });
+});
+```
+
+Automate cross-platform workflows: task created → post to #announcements, PR merged → auto-complete task, file uploaded → backup to cloud storage.
+
+### 2. AI-Powered Automation
+
+Leverage LLMs for intelligent task extraction from conversations:
+
+```typescript
+app.post("/ai/suggest", async (c) => {
+  const { context } = await c.req.json();
+
+  const completion = await openai.chat.completions.create({
+    messages: [
+      { role: "system", content: "Extract tasks from conversation" },
+      { role: "user", content: context },
+    ],
+  });
+
+  return c.json({
+    suggestions: JSON.parse(completion.choices[0].message.content),
+  });
+});
+```
+
+Auto-create tasks from meeting notes, suggest assignees based on expertise, estimate durations from historical data.
+
+### 3. Advanced Integrations
+
+Bidirectional sync with GitHub/Linear/Jira:
+
+```typescript
+app.post("/integrations/sync", async (c) => {
+  const sync = new SyncService(provider, credentials);
+  await sync.configure({ direction: "bidirectional" });
+  return c.json({ status: "syncing" });
+});
+```
+
+Link tasks to PRs/issues, auto-complete on merge, PR status badges in task view, branch creation from tasks.
 
 ## License
 
 This project is licensed under the MIT License. See [`LICENSE`](./LICENSE) for details.
+
+---
+
+_Built with Hand and OpenClaw_

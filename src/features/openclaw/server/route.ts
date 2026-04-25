@@ -357,90 +357,175 @@ app.patch(
   },
 );
 
-app.post(
-  "/resource",
+app.patch(
+  "/task",
   zValidator(
     "json",
-    z.object({
-      fileName: z.string().trim().min(1),
-      mimeType: z.string().trim().min(1),
-      base64Data: z.string().trim().min(1),
-      taskId: z.string().optional(),
-      transcription: z.string().optional(),
-    }),
+    z
+      .object({
+        id: z.string().trim().min(1).optional(),
+        taskId: z.string().trim().min(1).optional(),
+        task_id: z.string().trim().min(1).optional(),
+        title: z.string().trim().min(1).max(500).optional(),
+        name: z.string().trim().min(1).max(500).optional(),
+        description: z.string().max(5000).optional(),
+        dueDate: z.string().optional(),
+        priority: z.enum(["low", "medium", "high"]).optional(),
+        projectId: z.string().optional(),
+        assigneeId: z.string().optional(),
+        status: openClawStatus.optional(),
+      })
+      .transform((payload) => ({
+        taskId: payload.id ?? payload.taskId ?? payload.task_id,
+        title: payload.title ?? payload.name,
+        description: payload.description,
+        dueDate: payload.dueDate,
+        priority: payload.priority,
+        projectId: payload.projectId,
+        assigneeId: payload.assigneeId,
+        status: payload.status,
+      }))
+      .refine((payload) => Boolean(payload.taskId), {
+        message: "taskId is required",
+        path: ["taskId"],
+      })
+      .refine(
+        (payload) =>
+          Boolean(
+            payload.title ||
+            payload.description !== undefined ||
+            payload.dueDate !== undefined ||
+            payload.priority ||
+            payload.projectId ||
+            payload.assigneeId ||
+            payload.status,
+          ),
+        {
+          message: "No update fields provided",
+          path: ["taskId"],
+        },
+      ),
   ),
   async (c) => {
     const workspaceId = (c as any).get("workspaceId") as string;
-    const { fileName, mimeType, base64Data, taskId, transcription } =
-      c.req.valid("json");
+    const payload = c.req.valid("json");
+    const taskId = payload.taskId as string;
+    const { tables } = await createAdminClient();
 
-    const { storage, tables } = await createAdminClient();
+    const taskResult = await tables.listRows<any>(DATABASE_ID, TASKS_ID, [
+      Query.equal("$id", taskId),
+      Query.equal("workspaceId", workspaceId),
+      Query.limit(1),
+    ]);
 
-    let existingResources: string[] = [];
-    if (taskId) {
-      const taskResult = await tables.listRows<any>(DATABASE_ID, TASKS_ID, [
-        Query.equal("$id", taskId),
-        Query.equal("workspaceId", workspaceId),
-        Query.limit(1),
-      ]);
-      if (!taskResult.total) {
-        return c.json({ error: "task not found in this workspace" }, 404);
-      }
-      const task = taskResult.rows[0];
-      existingResources = Array.isArray(task.resources) ? task.resources : [];
+    if (!taskResult.total) {
+      return c.json({ error: "task not found in this workspace" }, 404);
     }
 
-    const parsedBase64 = parseBase64Payload(base64Data);
-    if (!parsedBase64) {
-      return c.json(
-        {
-          error:
-            "Something went wrong reaching ManageMe. Try again in a moment.",
-        },
-        400,
-      );
+    const updateData: Record<string, unknown> = {};
+    if (payload.title) {
+      updateData.name = payload.title;
     }
-    if (parsedBase64.buffer.byteLength > 15 * 1024 * 1024) {
-      return c.json({ error: "That file is too large for upload." }, 413);
+    if (payload.description !== undefined) {
+      updateData.description = payload.description;
+    }
+    if (payload.dueDate !== undefined) {
+      updateData.dueDate =
+        normalizeDueDate(payload.dueDate) ?? taskResult.rows[0].dueDate;
+    }
+    if (payload.priority) {
+      updateData.priority = payload.priority;
+    }
+    if (payload.projectId !== undefined) {
+      updateData.projectId = payload.projectId;
+    }
+    if (payload.assigneeId !== undefined) {
+      updateData.assigneeId = payload.assigneeId;
+    }
+    if (payload.status) {
+      updateData.status = dbStatusByOpenClawStatus[payload.status];
+      updateData.completedAt =
+        payload.status === "done" ? new Date().toISOString() : null;
     }
 
-    // Additional validation for file name and mime type
-    if (!fileName || fileName.trim() === "") {
-      return c.json({ error: "File name is required" }, 400);
-    }
-
-    if (!mimeType || mimeType.trim() === "") {
-      return c.json({ error: "File type is required" }, 400);
-    }
-
-    const file = await storage.createFile(
-      FILES_BUCKET_ID,
-      ID.unique(),
-      InputFile.fromBuffer(new Uint8Array(parsedBase64.buffer), fileName),
+    const updatedTask = await tables.updateRow(
+      DATABASE_ID,
+      TASKS_ID,
+      taskId,
+      updateData,
     );
-
-    if (taskId) {
-      const newResource = JSON.stringify({
-        fileId: file.$id,
-        fileName,
-        mimeType,
-        transcription: transcription ?? null,
-        uploadedAt: new Date().toISOString(),
-      });
-
-      await tables.updateRow(DATABASE_ID, TASKS_ID, taskId, {
-        resources: [...existingResources, newResource],
-      });
-    }
 
     return c.json({
       success: true,
-      fileId: file.$id,
-      fileName,
-      attachedToTask: taskId ?? null,
+      taskId: updatedTask.$id,
+      title: updatedTask.name,
+      status: openClawStatusByDbStatus[updatedTask.status] ?? "todo",
+      dueDate: updatedTask.dueDate,
     });
   },
 );
+
+app.post("/resource", async (c) => {
+  const workspaceId = (c as any).get("workspaceId") as string;
+  const contentType = (c.req.header("content-type") ?? "").toLowerCase();
+
+  const parsedUpload = await parseResourceUpload(c, contentType);
+  if (!parsedUpload.success) {
+    return c.json({ error: parsedUpload.error }, parsedUpload.status);
+  }
+
+  const { fileName, mimeType, taskId, transcription, buffer } = parsedUpload;
+
+  if (buffer.byteLength > 15 * 1024 * 1024) {
+    return c.json({ error: "That file is too large for upload." }, 413);
+  }
+
+  const { storage, tables } = await createAdminClient();
+
+  let existingResources: string[] = [];
+  if (taskId) {
+    const taskResult = await tables.listRows<any>(DATABASE_ID, TASKS_ID, [
+      Query.equal("$id", taskId),
+      Query.equal("workspaceId", workspaceId),
+      Query.limit(1),
+    ]);
+
+    if (!taskResult.total) {
+      return c.json({ error: "task not found in this workspace" }, 404);
+    }
+
+    const task = taskResult.rows[0];
+    existingResources = Array.isArray(task.resources) ? task.resources : [];
+  }
+
+  const file = await storage.createFile(
+    FILES_BUCKET_ID,
+    ID.unique(),
+    InputFile.fromBuffer(new Uint8Array(buffer), fileName),
+  );
+
+  if (taskId) {
+    const newResource = JSON.stringify({
+      fileId: file.$id,
+      fileName,
+      mimeType,
+      transcription: transcription ?? null,
+      uploadedAt: new Date().toISOString(),
+    });
+
+    await tables.updateRow(DATABASE_ID, TASKS_ID, taskId, {
+      resources: [...existingResources, newResource],
+    });
+  }
+
+  return c.json({
+    success: true,
+    fileId: file.$id,
+    fileName,
+    mimeType,
+    attachedToTask: taskId ?? null,
+  });
+});
 
 app.get(
   "/integrations",
@@ -701,21 +786,35 @@ function normalizeDueDate(value?: string): string | null {
 }
 
 function parseBase64Payload(base64Data: string): { buffer: Buffer } | null {
-  const normalizedBase64 = base64Data.includes(",")
-    ? (base64Data.split(",").at(-1) ?? "")
-    : base64Data;
-  const cleanBase64 = normalizedBase64.replace(/\s/g, "");
+  const unescapedBase64 = base64Data
+    .replace(/\\r\\n/g, "")
+    .replace(/\\n/g, "")
+    .replace(/\\r/g, "");
 
-  if (!cleanBase64 || cleanBase64.length % 4 !== 0) {
+  const normalizedBase64 = unescapedBase64.includes(",")
+    ? (unescapedBase64.split(",").at(-1) ?? "")
+    : unescapedBase64;
+  const cleanBase64 = normalizedBase64
+    .replace(/\s/g, "")
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const paddingLength = cleanBase64.length % 4;
+  const paddedBase64 =
+    paddingLength === 0
+      ? cleanBase64
+      : cleanBase64 + "=".repeat(4 - paddingLength);
+
+  if (!paddedBase64) {
     return null;
   }
 
-  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(cleanBase64)) {
+  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(paddedBase64)) {
     return null;
   }
 
   try {
-    const buffer = Buffer.from(cleanBase64, "base64");
+    const buffer = Buffer.from(paddedBase64, "base64");
     if (!buffer.byteLength) {
       return null;
     }
@@ -723,6 +822,324 @@ function parseBase64Payload(base64Data: string): { buffer: Buffer } | null {
   } catch {
     return null;
   }
+}
+
+const resourceJsonSchema = z
+  .object({
+    fileName: z.string().trim().min(1).optional(),
+    filename: z.string().trim().min(1).optional(),
+    file_name: z.string().trim().min(1).optional(),
+    name: z.string().trim().min(1).optional(),
+    mimeType: z.string().trim().min(1).optional(),
+    mime_type: z.string().trim().min(1).optional(),
+    contentType: z.string().trim().min(1).optional(),
+    base64Data: z.string().trim().min(1).optional(),
+    base64: z.string().trim().min(1).optional(),
+    data: z.string().trim().min(1).optional(),
+    fileData: z.string().trim().min(1).optional(),
+    taskId: z.string().trim().min(1).optional(),
+    task_id: z.string().trim().min(1).optional(),
+    task: z.string().trim().min(1).optional(),
+    transcription: z.string().optional(),
+    transcript: z.string().optional(),
+    text: z.string().optional(),
+  })
+  .transform((payload) => ({
+    fileName:
+      payload.fileName ??
+      payload.filename ??
+      payload.file_name ??
+      payload.name ??
+      "",
+    mimeType:
+      payload.mimeType ?? payload.mime_type ?? payload.contentType ?? "",
+    base64Data:
+      payload.base64Data ??
+      payload.base64 ??
+      payload.data ??
+      payload.fileData ??
+      "",
+    taskId: payload.taskId ?? payload.task_id ?? payload.task,
+    transcription: payload.transcription ?? payload.transcript ?? payload.text,
+  }));
+
+type ParsedResourceUpload =
+  | {
+      success: true;
+      fileName: string;
+      mimeType: string;
+      taskId?: string;
+      transcription?: string;
+      buffer: Buffer;
+    }
+  | {
+      success: false;
+      error: string;
+      status: number;
+    };
+
+async function parseResourceUpload(
+  c: any,
+  contentType: string,
+): Promise<ParsedResourceUpload> {
+  if (contentType.includes("multipart/form-data")) {
+    const form = await c.req.formData().catch(() => null);
+    if (!form) {
+      return {
+        success: false,
+        error: "Invalid multipart payload.",
+        status: 400,
+      };
+    }
+
+    let fileValue =
+      form.get("file") ??
+      form.get("attachment") ??
+      form.get("resource") ??
+      form.get("document");
+
+    if (!fileValue) {
+      for (const value of form.values()) {
+        if (typeof value !== "string") {
+          fileValue = value;
+          break;
+        }
+      }
+    }
+
+    if (!fileValue || typeof fileValue === "string") {
+      return {
+        success: false,
+        error: "No file found in multipart payload.",
+        status: 400,
+      };
+    }
+
+    const fileName =
+      firstNonEmpty(
+        form.get("fileName"),
+        form.get("filename"),
+        (fileValue as any).name,
+      ) ?? "attachment";
+    const mimeType =
+      firstNonEmpty(
+        form.get("mimeType"),
+        form.get("mime_type"),
+        (fileValue as any).type,
+      ) ?? inferMimeTypeFromFileName(fileName);
+
+    const taskId = firstNonEmpty(
+      form.get("taskId"),
+      form.get("task_id"),
+      form.get("task"),
+    );
+    const transcription = firstNonEmpty(
+      form.get("transcription"),
+      form.get("transcript"),
+      form.get("text"),
+    );
+
+    const arrayBuffer = await (fileValue as any).arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    return {
+      success: true,
+      fileName,
+      mimeType,
+      taskId: taskId || undefined,
+      transcription: transcription || undefined,
+      buffer,
+    };
+  }
+
+  if (contentType.includes("application/json") || contentType === "") {
+    const rawJson = await c.req.json().catch(() => null);
+    const parsedJson = resourceJsonSchema.safeParse(rawJson);
+
+    if (!parsedJson.success) {
+      return {
+        success: false,
+        error: "Invalid JSON payload for resource upload.",
+        status: 400,
+      };
+    }
+
+    const fileName = parsedJson.data.fileName.trim();
+    if (!fileName) {
+      return {
+        success: false,
+        error: "File name is required.",
+        status: 400,
+      };
+    }
+
+    const parsedBase64 = parseBase64Payload(parsedJson.data.base64Data);
+    if (!parsedBase64) {
+      return {
+        success: false,
+        error:
+          "Invalid base64 payload. Send a valid base64 string or use multipart upload.",
+        status: 400,
+      };
+    }
+
+    return {
+      success: true,
+      fileName,
+      mimeType:
+        parsedJson.data.mimeType.trim() || inferMimeTypeFromFileName(fileName),
+      taskId: parsedJson.data.taskId?.trim() || undefined,
+      transcription: parsedJson.data.transcription,
+      buffer: parsedBase64.buffer,
+    };
+  }
+
+  if (contentType.includes("application/octet-stream")) {
+    const arrayBuffer = await c.req.arrayBuffer().catch(() => null);
+    if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+      return {
+        success: false,
+        error:
+          "Empty binary body. Provide file bytes with --data-binary @path/to/file.",
+        status: 400,
+      };
+    }
+
+    const fileName =
+      firstNonEmpty(
+        c.req.header("x-file-name"),
+        c.req.query("fileName"),
+        c.req.query("filename"),
+      ) ?? "attachment.bin";
+    const mimeType =
+      firstNonEmpty(
+        c.req.header("x-mime-type"),
+        c.req.query("mimeType"),
+        c.req.query("mime_type"),
+      ) ?? inferMimeTypeFromFileName(fileName);
+    const taskId =
+      firstNonEmpty(
+        c.req.header("x-task-id"),
+        c.req.query("taskId"),
+        c.req.query("task_id"),
+      ) ?? undefined;
+    const transcription =
+      firstNonEmpty(
+        c.req.header("x-transcription"),
+        c.req.query("transcription"),
+      ) ?? undefined;
+
+    return {
+      success: true,
+      fileName,
+      mimeType,
+      taskId,
+      transcription,
+      buffer: Buffer.from(arrayBuffer),
+    };
+  }
+
+  if (contentType.includes("text/plain")) {
+    const rawBody = (await c.req.text().catch(() => "")).trim();
+    const fileName =
+      firstNonEmpty(
+        c.req.header("x-file-name"),
+        c.req.query("fileName"),
+        c.req.query("filename"),
+      ) ?? "attachment.bin";
+    const mimeType =
+      firstNonEmpty(
+        c.req.header("x-mime-type"),
+        c.req.query("mimeType"),
+        c.req.query("mime_type"),
+      ) ?? inferMimeTypeFromFileName(fileName);
+    const taskId =
+      firstNonEmpty(
+        c.req.header("x-task-id"),
+        c.req.query("taskId"),
+        c.req.query("task_id"),
+      ) ?? undefined;
+    const transcription =
+      firstNonEmpty(
+        c.req.header("x-transcription"),
+        c.req.query("transcription"),
+      ) ?? undefined;
+
+    const parsedBase64 = parseBase64Payload(rawBody);
+    if (!parsedBase64) {
+      return {
+        success: false,
+        error:
+          "Invalid raw text body. Provide base64 content, or use application/octet-stream for raw file bytes.",
+        status: 400,
+      };
+    }
+
+    return {
+      success: true,
+      fileName,
+      mimeType,
+      taskId,
+      transcription,
+      buffer: parsedBase64.buffer,
+    };
+  }
+
+  return {
+    success: false,
+    error:
+      "Unsupported content type. Use application/json, multipart/form-data, text/plain (base64), or application/octet-stream (raw bytes).",
+    status: 415,
+  };
+}
+
+function firstNonEmpty(...values: unknown[]): string | null {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return null;
+}
+
+function inferMimeTypeFromFileName(fileName: string): string {
+  const extension = fileName.split(".").pop()?.toLowerCase();
+
+  const mimeByExtension: Record<string, string> = {
+    png: "image/png",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    webp: "image/webp",
+    gif: "image/gif",
+    svg: "image/svg+xml",
+    pdf: "application/pdf",
+    txt: "text/plain",
+    md: "text/markdown",
+    json: "application/json",
+    csv: "text/csv",
+    mp3: "audio/mpeg",
+    wav: "audio/wav",
+    ogg: "audio/ogg",
+    m4a: "audio/mp4",
+    mp4: "video/mp4",
+    mov: "video/quicktime",
+    webm: "video/webm",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls: "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    zip: "application/zip",
+    rar: "application/vnd.rar",
+    "7z": "application/x-7z-compressed",
+  };
+
+  if (!extension) {
+    return "application/octet-stream";
+  }
+
+  return mimeByExtension[extension] ?? "application/octet-stream";
 }
 
 export default app;
