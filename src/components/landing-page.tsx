@@ -278,7 +278,7 @@ export function LandingPage() {
             <BrandLogo />
 
             <div className="hidden md:flex items-center gap-8 text-sm text-neutral-500">
-              {["Features", "Automation", "Pricing", "Docs"].map((l) => (
+              {["Features", "Automation"].map((l) => (
                 <a
                   key={l}
                   href={`#${l.toLowerCase()}`}
