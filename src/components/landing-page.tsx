@@ -912,7 +912,8 @@ export function LandingPage() {
                   height: 0,
                 }}
               >
-                <iframe
+                Coming Soon
+                {/* <iframe
                   src="https://www.youtube.com/embed/ky-DZwR02fo?rel=0&modestbranding=1&color=white"
                   title="ManageMe product demo"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -925,7 +926,7 @@ export function LandingPage() {
                     height: "100%",
                     border: "none",
                   }}
-                />
+                /> */}
               </div>
             </div>
           </motion.div>
