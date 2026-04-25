@@ -4,17 +4,17 @@ import { cn } from "@/lib/utils";
 import { TaskStatus } from "@/features/tasks/types";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-background",
+  "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-background",
   {
     variants: {
       variant: {
         default:
-          "border-white/20 bg-white text-black shadow hover:bg-neutral-200",
+          "border-white/25 bg-white text-black shadow-sm hover:-translate-y-0.5 hover:bg-neutral-200",
         secondary:
-          "border-white/10 bg-white/[0.08] text-neutral-100 hover:bg-white/[0.14]",
+          "border-white/15 bg-white/[0.08] text-neutral-100 hover:bg-white/[0.14]",
         destructive:
-          "border-red-400/30 bg-red-500/15 text-red-100 shadow hover:bg-red-500/25",
-        outline: "border-white/15 text-foreground",
+          "border-red-400/30 bg-red-500/15 text-red-100 shadow-sm hover:bg-red-500/25",
+        outline: "border-white/20 text-foreground",
         [TaskStatus.TODO]:
           "border-neutral-500/30 bg-neutral-500/15 text-neutral-200 hover:bg-neutral-500/25",
         [TaskStatus.IN_PROGRESS]:
@@ -30,11 +30,12 @@ const badgeVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {

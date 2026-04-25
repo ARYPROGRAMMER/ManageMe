@@ -11,7 +11,6 @@ import { MemberAvatar } from "@/features/members/components/member-avatar";
 import { useGetProjects } from "@/features/projects/api/use-get-projects";
 import { ProjectAvatar } from "@/features/projects/components/project-avatar";
 import { useCreateProjectModal } from "@/features/projects/hooks/use-create-project-modal";
-import { Project } from "@/features/projects/types";
 import { useGetTasks } from "@/features/tasks/api/use-get-tasks";
 import { useCreateTaskModal } from "@/features/tasks/hooks/use-create-task-modal";
 import { useGetWorkspaceAnalytics } from "@/features/workspaces/api/use-get-workspace-analytics";
@@ -19,6 +18,27 @@ import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { formatDistanceToNow } from "date-fns";
 import { CalendarIcon, PlusIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
+
+interface TaskListItem {
+  $id: string;
+  name: string;
+  dueDate: string;
+  project?: {
+    name?: string;
+  };
+}
+
+interface ProjectListItem {
+  $id: string;
+  name: string;
+  imageUrl?: string;
+}
+
+interface MemberListItem {
+  $id: string;
+  name: string;
+  email: string;
+}
 
 export const WorkspaceIdClient = () => {
   const workspaceId = useWorkspaceId();
@@ -62,7 +82,7 @@ export const WorkspaceIdClient = () => {
 };
 
 interface TaskListProps {
-  data: any[];
+  data: TaskListItem[];
   total: number;
 }
 
@@ -77,7 +97,9 @@ export const TaskList = ({ data, total }: TaskListProps) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-lg font-bold text-white">Tasks</p>
-            <p className="text-xs text-muted-foreground">{total} tracked items</p>
+            <p className="text-xs text-muted-foreground">
+              {total} tracked items
+            </p>
           </div>
 
           <Button variant={"muted"} size={"icon"} onClick={createTask}>
@@ -130,7 +152,7 @@ export const TaskList = ({ data, total }: TaskListProps) => {
 };
 
 interface ProjectListProps {
-  data: any[];
+  data: ProjectListItem[];
   total: number;
 }
 
@@ -145,7 +167,9 @@ export const ProjectList = ({ data, total }: ProjectListProps) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-lg font-bold text-white">Projects</p>
-            <p className="text-xs text-muted-foreground">{total} active spaces</p>
+            <p className="text-xs text-muted-foreground">
+              {total} active spaces
+            </p>
           </div>
 
           <Button variant={"secondary"} size={"icon"} onClick={createProject}>
@@ -188,7 +212,7 @@ export const ProjectList = ({ data, total }: ProjectListProps) => {
 };
 
 interface MembersListProps {
-  data: any[];
+  data: MemberListItem[];
   total: number;
 }
 
@@ -201,7 +225,9 @@ export const MembersList = ({ data, total }: MembersListProps) => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-lg font-bold text-white">Members</p>
-            <p className="text-xs text-muted-foreground">{total} collaborators</p>
+            <p className="text-xs text-muted-foreground">
+              {total} collaborators
+            </p>
           </div>
 
           <Button asChild variant={"secondary"} size={"icon"}>
