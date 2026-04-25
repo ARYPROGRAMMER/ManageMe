@@ -32,19 +32,5 @@
         "MANAGEME_WORKSPACE_ID": "REPLACE_WITH_WORKSPACE_ID"
       }
     }
-  ],
-  "cron": [
-    {
-      "schedule": "0 8 * * *",
-      "message": "Use the manageme skill to send a morning briefing of open, high-priority, and due-today tasks."
-    },
-    {
-      "schedule": "0 * * * *",
-      "message": "Use the manageme skill to check for tasks due within 1 hour and send concise reminders."
-    },
-    {
-      "schedule": "0 18 * * *",
-      "message": "Use the manageme skill to summarize completed tasks and remaining work."
-    }
   ]
 }
