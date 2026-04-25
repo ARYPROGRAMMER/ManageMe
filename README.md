@@ -4,7 +4,7 @@
 
 # ManageMe
 
-A workspace and task management dashboard with OpenClaw integration for external channels.
+I was fed up of going to a task management service and organise my day and goals, hence presenting ManageMe - A workspace and task management dashboard with OpenClaw integration for external channels.
 
 ## Quick Start
 
