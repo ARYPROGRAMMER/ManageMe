@@ -13,7 +13,7 @@ const comfortaa = Comfortaa({
 
 export const metadata: Metadata = {
   title: "ManageMe",
-  description: "A premium workspace and task operations product.",
+  description: "A calm workspace for projects, tasks, and team collaboration.",
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
         className={cn(
           comfortaa.variable,
           comfortaa.className,
-          "min-h-screen overflow-x-hidden antialiased"
+          "min-h-screen overflow-x-hidden antialiased",
         )}
       >
         <Toaster />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import {
   ExternalLink,
   PlugZap,
   ShieldCheck,
+  X,
 } from "lucide-react";
 
 type PlatformId = "telegram" | "slack" | "discord" | "whatsapp" | "signal";
@@ -118,7 +119,7 @@ const PLATFORMS: {
 export const ConnectPlatformsClient = () => {
   const params = useParams();
   const workspaceId = params.workspaceId as string;
-
+  const router = useRouter();
   const [credentials, setCredentials] = useState<Record<string, string>>({});
   const [connected, setConnected] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState<Record<string, boolean>>({});
@@ -363,7 +364,14 @@ export const ConnectPlatformsClient = () => {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
-      <div className="glass-panel mb-6 rounded-3xl p-6">
+      <div className="glass-panel mb-6 rounded-3xl p-6 relative">
+        <button
+          onClick={() => router.back()}
+          className="absolute right-4 top-4 inline-flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-neutral-300 transition hover:bg-white/[0.12] hover:text-white"
+          aria-label="Go back"
+        >
+          <X className="size-4" />
+        </button>
         <div className="mb-5 flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06]">
           <PlugZap className="size-6 text-neutral-200" />
         </div>
@@ -443,7 +451,11 @@ export const ConnectPlatformsClient = () => {
                   />
                   {isConnectable && (
                     <Button
-                      onClick={() => void connectPlatform(platform.id)}
+                      onClick={() =>
+                        void connectPlatform(
+                          platform.id as ConnectablePlatformId,
+                        )
+                      }
                       disabled={isLoading || isConnected}
                       variant={isConnected ? "outline" : "primary"}
                       size="sm"

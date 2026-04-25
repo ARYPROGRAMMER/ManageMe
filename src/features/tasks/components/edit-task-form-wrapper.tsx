@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { PremiumLoader } from "@/components/premium-loader";
+import { AppLoader } from "@/components/app-loader";
 import { useGetMembers } from "@/features/members/api/use-get-members";
 import { useGetProjects } from "@/features/projects/api/use-get-projects";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
@@ -45,7 +45,7 @@ export const EditTaskFormWrapper = ({
     return (
       <Card className="glass-panel-strong h-[714px] w-full rounded-3xl border-white/15">
         <CardContent className="flex h-full items-center justify-center">
-          <PremiumLoader label="Loading task details" />
+          <AppLoader label="Loading task details" />
         </CardContent>
       </Card>
     );

@@ -23,13 +23,12 @@ export const useLogout = () => {
     },
     onSuccess: () => {
       toast.success("Logged out successfully");
-      router.refresh();
-
+      router.push("/"); // Redirect to home after logout
       queryClient.invalidateQueries();
     },
     onError: (error) => {
       toast.error("Failed to logout: " + error.message);
-    }
+    },
   });
 
   return mutation;

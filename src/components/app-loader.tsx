@@ -1,16 +1,13 @@
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface PremiumLoaderProps {
+interface AppLoaderProps {
   className?: string;
   label?: string;
   fillScreen?: boolean;
 }
 
-export function PremiumLoader({
-  className,
-  label = "Loading workspace",
-  fillScreen,
-}: PremiumLoaderProps) {
+export function AppLoader({ className, label, fillScreen }: AppLoaderProps) {
   return (
     <div
       className={cn(
@@ -42,3 +39,6 @@ export function PremiumLoader({
     </div>
   );
 }
+
+// Back-compat alias. Prefer `AppLoader` going forward.
+export const PremiumLoader = AppLoader;

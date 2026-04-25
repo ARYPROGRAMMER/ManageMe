@@ -16,9 +16,11 @@ export function BrandLogo({ href = "/", className, compact }: BrandLogoProps) {
       </div>
       {!compact && (
         <div className="flex flex-col leading-none">
-          <span className="text-lg font-bold text-white">ManageMe</span>
-          <span className="mt-1 text-[10px] font-semibold uppercase text-neutral-500">
-            Focus OS
+          <span className="text-base font-semibold tracking-tight text-white">
+            ManageMe
+          </span>
+          <span className="mt-1 text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
+            workspace
           </span>
         </div>
       )}

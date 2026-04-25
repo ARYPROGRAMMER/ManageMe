@@ -73,19 +73,21 @@ app.post(
   "/task",
   zValidator(
     "json",
-    z.object({
-      title: z.string().trim().min(1).max(500).optional(),
-      name: z.string().trim().min(1).max(500).optional(),
-      description: z.string().max(5000).optional(),
-      dueDate: z.string().optional(),
-      priority: z.enum(["low", "medium", "high"]).default("medium"),
-      projectId: z.string().optional(),
-      assigneeId: z.string().optional(),
-      sourceChannel: z.string().optional(),
-    }).refine((data) => Boolean(data.title || data.name), {
-      message: "title is required",
-      path: ["title"],
-    }),
+    z
+      .object({
+        title: z.string().trim().min(1).max(500).optional(),
+        name: z.string().trim().min(1).max(500).optional(),
+        description: z.string().max(5000).optional(),
+        dueDate: z.string().optional(),
+        priority: z.enum(["low", "medium", "high"]).default("medium"),
+        projectId: z.string().optional(),
+        assigneeId: z.string().optional(),
+        sourceChannel: z.string().optional(),
+      })
+      .refine((data) => Boolean(data.title || data.name), {
+        message: "title is required",
+        path: ["title"],
+      }),
   ),
   async (c) => {
     const workspaceId = (c as any).get("workspaceId") as string;
@@ -108,11 +110,7 @@ app.post(
       );
     }
 
-    let projectId = await resolveProjectId(
-      tables,
-      workspaceId,
-      data.projectId,
-    );
+    let projectId = await resolveProjectId(tables, workspaceId, data.projectId);
     if (!projectId) {
       projectId = await createProjectInWorkspace(tables, workspaceId, "Inbox");
     }
@@ -161,6 +159,7 @@ app.post(
       title: task.name,
       priority: task.priority,
       dueDate: task.dueDate,
+      sourceChannel: task.createdVia,
     });
   },
 );
@@ -393,10 +392,25 @@ app.post(
 
     const parsedBase64 = parseBase64Payload(base64Data);
     if (!parsedBase64) {
-      return c.json({ error: "invalid base64Data payload" }, 400);
+      return c.json(
+        {
+          error:
+            "Something went wrong reaching ManageMe. Try again in a moment.",
+        },
+        400,
+      );
     }
     if (parsedBase64.buffer.byteLength > 15 * 1024 * 1024) {
-      return c.json({ error: "file too large (max 15MB)" }, 413);
+      return c.json({ error: "That file is too large for upload." }, 413);
+    }
+
+    // Additional validation for file name and mime type
+    if (!fileName || fileName.trim() === "") {
+      return c.json({ error: "File name is required" }, 400);
+    }
+
+    if (!mimeType || mimeType.trim() === "") {
+      return c.json({ error: "File type is required" }, 400);
     }
 
     const file = await storage.createFile(
@@ -552,12 +566,24 @@ app.post(
 async function openClawAuth(c: any, next: any) {
   const secret = c.req.header("x-openclaw-secret");
   if (!secret) {
-    return c.json({ error: "missing secret" }, 401);
+    return c.json(
+      {
+        error:
+          "Your ManageMe connection needs re-authorizing. Please check your settings.",
+      },
+      401,
+    );
   }
 
   const workspaceId = c.req.query("w") ?? c.req.header("x-workspace-id");
   if (!workspaceId) {
-    return c.json({ error: "missing workspaceId" }, 400);
+    return c.json(
+      {
+        error:
+          "That workspace or item was not found. Please check your ManageMe configuration.",
+      },
+      400,
+    );
   }
 
   const { tables } = await createAdminClient();
@@ -568,12 +594,24 @@ async function openClawAuth(c: any, next: any) {
   );
 
   if (!integrations.total) {
-    return c.json({ error: "workspace integration not found" }, 404);
+    return c.json(
+      {
+        error:
+          "That workspace or item was not found. Please check your ManageMe configuration.",
+      },
+      404,
+    );
   }
 
   const integration = integrations.rows[0];
   if (!integration.openclawSecret || integration.openclawSecret !== secret) {
-    return c.json({ error: "invalid secret" }, 401);
+    return c.json(
+      {
+        error:
+          "Your ManageMe connection needs re-authorizing. Please check your settings.",
+      },
+      401,
+    );
   }
 
   c.set("workspaceId", workspaceId);
@@ -635,11 +673,16 @@ async function createProjectInWorkspace(
   name: string,
 ) {
   const safeName = name.trim() || "Inbox";
-  const project = await tables.createRow(DATABASE_ID, PROJECTS_ID, ID.unique(), {
-    workspaceId,
-    name: safeName,
-    imageUrl: "",
-  });
+  const project = await tables.createRow(
+    DATABASE_ID,
+    PROJECTS_ID,
+    ID.unique(),
+    {
+      workspaceId,
+      name: safeName,
+      imageUrl: "",
+    },
+  );
 
   return project.$id as string;
 }

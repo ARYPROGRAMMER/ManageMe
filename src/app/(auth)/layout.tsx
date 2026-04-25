@@ -20,9 +20,7 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
           <BrandLogo />
 
           <Button asChild variant={"secondary"} size="sm">
-            <Link
-              href={pathname === "/sign-in" ? "/sign-up" : "/sign-in"}
-            >
+            <Link href={pathname === "/sign-in" ? "/sign-up" : "/sign-in"}>
               {pathname === "/sign-in" ? "Sign Up" : "Sign In"}
             </Link>
           </Button>
@@ -38,10 +36,15 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
             </h1>
             <p className="mt-5 text-base leading-8 text-neutral-400">
               Sign in to manage workspaces, projects, members, task boards,
-              calendar views, and automation settings in one premium dark UI.
+              calendar views, and automation settings in one focused dark UI.
             </p>
             <div className="mt-8 grid grid-cols-2 gap-3">
-              {["Secure Appwrite session", "Workspace switching", "OpenClaw setup", "Task workflows"].map((item) => (
+              {[
+                "Secure Appwrite session",
+                "Workspace switching",
+                "OpenClaw setup",
+                "Task workflows",
+              ].map((item) => (
                 <div
                   key={item}
                   className="rounded-2xl border border-white/10 bg-white/[0.045] p-4 text-sm font-semibold text-neutral-300"

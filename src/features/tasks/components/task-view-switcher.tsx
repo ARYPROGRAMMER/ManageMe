@@ -1,7 +1,7 @@
 "use client";
 
 import { DottedSeparator } from "@/components/dotted-separator";
-import { PremiumLoader } from "@/components/premium-loader";
+import { AppLoader } from "@/components/app-loader";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlusIcon } from "lucide-react";
@@ -50,7 +50,7 @@ export const TasksViewSwitcher = ({
         json: { tasks },
       });
     },
-    [bulkUpdate]
+    [bulkUpdate],
   );
 
   const { open } = useCreateTaskModal();
@@ -83,7 +83,7 @@ export const TasksViewSwitcher = ({
         <DottedSeparator className="my-4" />
         {isLoadingTasks ? (
           <div className="flex h-[360px] w-full flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/[0.03]">
-            <PremiumLoader label="Transforming task views" />
+            <AppLoader label="Transforming task views" />
           </div>
         ) : (
           <>

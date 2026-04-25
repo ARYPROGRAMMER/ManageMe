@@ -1,7 +1,7 @@
 "use client";
 
 import { UserButton } from "@/features/auth/components/user-button";
-import React from "react";
+import { useEffect, useState } from "react";
 import MobileSidebar from "./mobile-sidebar";
 import { usePathname } from "next/navigation";
 import { Activity } from "lucide-react";
@@ -13,7 +13,7 @@ const pathnameMap = {
   },
   projects: {
     title: "Projects",
-    description: "Focus on one project while keeping execution visible.",
+    description: "View and manage your projects.",
   },
   settings: {
     title: "Settings",
@@ -37,19 +37,34 @@ function Navbar() {
   const pathnameKey = pathnameParts[3] as keyof typeof pathnameMap;
 
   const { title, description } = pathnameMap[pathnameKey] || defaultMap;
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 4);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="sticky top-0 z-20 border-b border-white/10 bg-background/70 px-4 py-4 backdrop-blur-2xl sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4">
-      <div className="flex-col hidden lg:flex">
-        <h1 className="text-2xl font-bold text-white">{title}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      </div>
-      <MobileSidebar />
-        <div className="ml-auto hidden h-10 items-center rounded-2xl border border-white/10 bg-white/[0.04] px-3 text-sm text-muted-foreground md:flex">
-          <Activity className="mr-2 size-4" />
-          <span>Live workspace</span>
+    <nav
+      className={`
+      sticky top-0 z-20 border-b border-white/10 
+      ${scrolled ? "bg-background/90 backdrop-blur-lg" : "bg-background/70 backdrop-blur-2xl"}
+      transition-all duration-300 px-4 py-3 sm:px-6 lg:px-8
+    `}
+    >
+      <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3">
+        <div className="flex-col hidden lg:flex">
+          <h1 className="text-xl font-bold text-white">{title}</h1>
+          <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
         </div>
+        <MobileSidebar />
+   
         <UserButton />
       </div>
     </nav>

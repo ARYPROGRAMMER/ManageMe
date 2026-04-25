@@ -1,7 +1,7 @@
-import { PremiumLoader } from "./premium-loader";
+import { AppLoader } from "./app-loader";
 
 function PageLoader() {
-  return <PremiumLoader fillScreen label="Shaping your workspace" />;
+  return <AppLoader fillScreen />;
 }
 
 export default PageLoader;
