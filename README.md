@@ -2,8 +2,6 @@
 	<img src="./readme-logo.svg" alt="ManageMe Logo" />
 </p>
 
-# ManageMe
-
 I was fed up of going to a task management service and organise my day and goals, hence presenting ManageMe - A workspace and task management dashboard with OpenClaw integration for external channels.
 
 ## Quick Start
@@ -119,6 +117,12 @@ export DISCORD_BOT_TOKEN="your-discord-token"
 ```bash
 openclaw start
 ```
+
+## Demo
+
+🎬 [Watch Demo Video](https://youtu.be/JJ8bBrurmws)
+
+See how ManageMe works with Discord, file uploads, and real-time updates.
 
 ## Usage
 

@@ -355,7 +355,7 @@ const app = new Hono()
       InputFile.fromBuffer(new Uint8Array(buffer), fileName),
     );
 
-    const existingResources = parseTaskResources(task.resources);
+    const existingResources = parseTaskResources(task.resources || []);
     const newResource = {
       fileId: uploaded.$id,
       fileName,
@@ -364,8 +364,10 @@ const app = new Hono()
       uploadedAt: new Date().toISOString(),
     };
 
+    const allResources = [...existingResources, newResource];
+
     await tables.updateRow(DATABASE_ID, TASKS_ID, taskId, {
-      resources: [...existingResources, JSON.stringify(newResource)],
+      resources: allResources.map((resource) => JSON.stringify(resource)),
     });
 
     return c.json({ data: newResource });

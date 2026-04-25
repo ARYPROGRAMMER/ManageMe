@@ -106,7 +106,7 @@ app.post(
           error:
             "No assignee available in this workspace. Add a member or provide a valid assigneeId.",
         },
-        400,
+        400 as const,
       );
     }
 
@@ -177,7 +177,7 @@ app.get("/tasks", async (c) => {
   if (status !== "all") {
     const parsedStatus = openClawStatus.safeParse(status);
     if (!parsedStatus.success) {
-      return c.json({ error: "invalid status" }, 400);
+      return c.json({ error: "invalid status" }, 400 as const);
     }
     queries.push(
       Query.equal("status", dbStatusByOpenClawStatus[parsedStatus.data]),
@@ -191,7 +191,7 @@ app.get("/tasks", async (c) => {
   if (dueWithin) {
     const parsedHours = Number.parseInt(dueWithin.replace("h", ""), 10);
     if (Number.isNaN(parsedHours) || parsedHours <= 0) {
-      return c.json({ error: "invalid dueWithin format" }, 400);
+      return c.json({ error: "invalid dueWithin format" }, 400 as const);
     }
 
     const cutoff = new Date(
@@ -254,7 +254,10 @@ app.get("/project", async (c) => {
     ]);
 
     if (!project.total) {
-      return c.json({ error: "project not found in this workspace" }, 404);
+      return c.json(
+        { error: "project not found in this workspace" },
+        404 as const,
+      );
     }
 
     return c.json({
@@ -319,7 +322,7 @@ app.patch("/task/:id/complete", async (c) => {
     Query.limit(1),
   ]);
   if (!taskResult.total) {
-    return c.json({ error: "task not found in this workspace" }, 404);
+    return c.json({ error: "task not found in this workspace" }, 404 as const);
   }
 
   await tables.updateRow(DATABASE_ID, TASKS_ID, taskId, {
@@ -345,7 +348,10 @@ app.patch(
       Query.limit(1),
     ]);
     if (!taskResult.total) {
-      return c.json({ error: "task not found in this workspace" }, 404);
+      return c.json(
+        { error: "task not found in this workspace" },
+        404 as const,
+      );
     }
 
     await tables.updateRow(DATABASE_ID, TASKS_ID, taskId, {
@@ -419,7 +425,10 @@ app.patch(
     ]);
 
     if (!taskResult.total) {
-      return c.json({ error: "task not found in this workspace" }, 404);
+      return c.json(
+        { error: "task not found in this workspace" },
+        404 as const,
+      );
     }
 
     const updateData: Record<string, unknown> = {};
@@ -471,13 +480,16 @@ app.post("/resource", async (c) => {
 
   const parsedUpload = await parseResourceUpload(c, contentType);
   if (!parsedUpload.success) {
-    return c.json({ error: parsedUpload.error }, parsedUpload.status);
+    return c.json({ error: parsedUpload.error }, parsedUpload.status as any);
   }
 
   const { fileName, mimeType, taskId, transcription, buffer } = parsedUpload;
 
   if (buffer.byteLength > 15 * 1024 * 1024) {
-    return c.json({ error: "That file is too large for upload." }, 413);
+    return c.json(
+      { error: "That file is too large for upload." },
+      413 as const,
+    );
   }
 
   const { storage, tables } = await createAdminClient();
@@ -491,7 +503,10 @@ app.post("/resource", async (c) => {
     ]);
 
     if (!taskResult.total) {
-      return c.json({ error: "task not found in this workspace" }, 404);
+      return c.json(
+        { error: "task not found in this workspace" },
+        404 as const,
+      );
     }
 
     const task = taskResult.rows[0];
@@ -543,7 +558,7 @@ app.get(
     });
 
     if (!member) {
-      return c.json({ error: "Unauthorized" }, 401);
+      return c.json({ error: "Unauthorized" }, 401 as const);
     }
 
     const result = await tables.listRows<any>(
@@ -591,7 +606,7 @@ app.post(
     });
 
     if (!member) {
-      return c.json({ error: "Unauthorized" }, 401);
+      return c.json({ error: "Unauthorized" }, 401 as const);
     }
 
     const existing = await tables.listRows<any>(
@@ -921,12 +936,13 @@ async function parseResourceUpload(
         form.get("filename"),
         (fileValue as any).name,
       ) ?? "attachment";
+    const fileType = (fileValue as any).type;
     const mimeType =
-      firstNonEmpty(
-        form.get("mimeType"),
-        form.get("mime_type"),
-        (fileValue as any).type,
-      ) ?? inferMimeTypeFromFileName(fileName);
+      firstNonEmpty(form.get("mimeType"), form.get("mime_type")) ??
+      (fileType && fileType !== "text/plain"
+        ? fileType
+        : inferMimeTypeFromFileName(fileName)) ??
+      "application/octet-stream";
 
     const taskId = firstNonEmpty(
       form.get("taskId"),
