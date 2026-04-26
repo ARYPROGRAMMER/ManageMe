@@ -24,8 +24,8 @@ export const useRegister = () => {
     },
     onSuccess: () => {
       toast.success("Registered successfully");
+      router.replace("/");
       router.refresh();
-      // window.location.reload();
       queryClient.invalidateQueries({ queryKey: ["current"] });
     },
     onError: (error) => {

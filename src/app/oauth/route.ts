@@ -1,6 +1,5 @@
 import { AUTH_COOKIE } from "@/features/auth/constants";
 import { createAdminClient } from "@/lib/appwrite";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -17,12 +16,15 @@ export async function GET(request: NextRequest) {
     secret,
   });
 
-  cookies().set(AUTH_COOKIE, session.secret, {
+  const response = NextResponse.redirect(new URL("/", request.url));
+
+  response.cookies.set(AUTH_COOKIE, session.secret, {
     path: "/",
     httpOnly: true,
-    sameSite: "strict",
-    secure: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 30,
   });
 
-  return NextResponse.redirect(`${request.nextUrl.origin}/`);
+  return response;
 }

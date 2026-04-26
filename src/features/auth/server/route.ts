@@ -23,7 +23,7 @@ const app = new Hono()
       path: "/",
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 60 * 60 * 24 * 30,
     });
 
@@ -46,12 +46,12 @@ const app = new Hono()
         path: "/",
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 60 * 60 * 24 * 30,
       });
 
       return c.json({ success: true });
-    }
+    },
   )
   .post("/logout", sessionMiddleware, async (c) => {
     const account = c.get("account");
